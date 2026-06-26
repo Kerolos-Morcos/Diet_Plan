@@ -91,6 +91,20 @@ const i18n = {
     ntfyScheduled: "تم جدولة إشعارات ntfy ✅",
     ntfyFailed: "حصل خطأ في ntfy",
     calendarDownloaded: "ملف التقويم اتنزّل ✅",
+    googleCalendarTitle: "Google Calendar",
+    googleCalendarHint: "الروابط دي هتفتح Google Calendar ببيانات المنبه جاهزة. أنت بس بتدوس Save جوه Google Calendar.",
+    addTodayGoogle: "اعرض روابط Google Calendar للنهاردة",
+    addToGoogle: "ضيف لـ Google Calendar",
+    doneAction: "تمام خلصت",
+    snoozeAction: "أجل 5 دقايق",
+    snoozeLimit: "وصلت للحد الأقصى للتأجيل",
+    snoozed: "اتأجل 5 دقايق ⏰",
+    taskDone: "تمام.. اتعلمت خلصت ✅",
+    repeatEvery: "يتكرر كل",
+    repeatHours: "ساعة",
+    repeatHint: "لو الدواء بيتاخد كل 8 ساعات مثلًا، فعل التكرار واكتب 8. وقت المنبه الأساسي هو بداية التكرار.",
+    activeProgramsHint: "ممكن تفعّل أكتر من بروجرام في نفس الوقت. لو منبهين في نفس المعاد، هيظهروا الاتنين بالترتيب.",
+    storageAdvice: "التخزين المحلي الحالي مناسب للبيانات الصغيرة. لو هتزيد صور وتاريخ طويل، الأفضل ننقل الصور والتاريخ لـ IndexedDB المجاني داخل نفس المتصفح.",
     kg: "كجم",
   },
   en: {
@@ -177,6 +191,20 @@ const i18n = {
     ntfyScheduled: "ntfy reminders scheduled ✅",
     ntfyFailed: "ntfy error",
     calendarDownloaded: "Calendar file downloaded ✅",
+    googleCalendarTitle: "Google Calendar",
+    googleCalendarHint: "These links open Google Calendar with the reminder details ready. Just tap Save inside Google Calendar.",
+    addTodayGoogle: "Show today's Google Calendar links",
+    addToGoogle: "Add to Google Calendar",
+    doneAction: "Done",
+    snoozeAction: "Snooze 5 min",
+    snoozeLimit: "Maximum snooze count reached",
+    snoozed: "Snoozed for 5 minutes ⏰",
+    taskDone: "Done ✅",
+    repeatEvery: "Repeat every",
+    repeatHours: "hours",
+    repeatHint: "For meds taken every 8 hours, enable repeat and enter 8. The alarm time is the first dose time.",
+    activeProgramsHint: "You can activate more than one program at the same time. If reminders share the same time, both will appear in order.",
+    storageAdvice: "LocalStorage is okay for small data. For many photos and long history, the free next step is IndexedDB in the same browser.",
     kg: "kg",
   },
 };
@@ -299,6 +327,7 @@ const p1Tasks = [
 ];
 const defaultState = {
   activeProgramId: "p1",
+  activeProgramIds: ["p1"],
   settings: { sound: true, vibrate: true, theme: "light", lang: "arz", ntfy:{enabled:false, server:"https://ntfy.sh", topic:""} },
   programs: [
     {
@@ -314,6 +343,7 @@ const defaultState = {
     },
   ],
   done: {},
+  snoozes: {},
   water: {},
   weights: [],
   snacks: [],
@@ -336,6 +366,8 @@ function load() {
 function mergeState(data) {
   const merged = structuredClone(defaultState);
   Object.assign(merged, data);
+  merged.activeProgramIds = Array.isArray(data.activeProgramIds) && data.activeProgramIds.length ? data.activeProgramIds : [data.activeProgramId || "p1"];
+  merged.snoozes = data.snoozes || {};
   merged.settings = { ...defaultState.settings, ...(data.settings || {}) };
   merged.settings.ntfy = { ...defaultState.settings.ntfy, ...(data.settings?.ntfy || {}) };
   merged.programs = (
@@ -359,6 +391,7 @@ function normalizeProgram(p) {
       titleEn: t.titleEn || t.title || "",
       detailsAr: t.detailsAr || t.details || "",
       detailsEn: t.detailsEn || t.details || "",
+      repeat: { enabled: !!t.repeat?.enabled, everyHours: Number(t.repeat?.everyHours || 8) },
     })),
   };
 }
@@ -366,10 +399,64 @@ function save() {
   localStorage.setItem(KEY, JSON.stringify(state));
 }
 function activeProgram() {
-  return (
-    state.programs.find((p) => p.id === state.activeProgramId) ||
-    state.programs[0]
-  );
+  return activePrograms()[0] || state.programs[0];
+}
+function activePrograms() {
+  const ids = Array.isArray(state.activeProgramIds) && state.activeProgramIds.length
+    ? state.activeProgramIds
+    : [state.activeProgramId || "p1"];
+  const found = state.programs.filter((p) => ids.includes(p.id));
+  return found.length ? found : [state.programs[0]].filter(Boolean);
+}
+function isProgramActive(id) {
+  return activePrograms().some((p) => p.id === id);
+}
+function toggleProgramActive(id) {
+  state.activeProgramIds = Array.isArray(state.activeProgramIds) ? state.activeProgramIds : [state.activeProgramId || id];
+  if (state.activeProgramIds.includes(id)) {
+    if (state.activeProgramIds.length === 1) {
+      showToast(isAr() ? "لازم تسيب بروجرام واحد متفعل على الأقل" : "Keep at least one active program");
+      return;
+    }
+    state.activeProgramIds = state.activeProgramIds.filter((x) => x !== id);
+  } else {
+    state.activeProgramIds.push(id);
+  }
+  state.activeProgramId = state.activeProgramIds[0];
+  save();
+  render();
+}
+function expandedTaskId(programId, taskId, time) {
+  return `${programId}__${taskId}__${String(time).replace(":", "")}`;
+}
+function expandTaskForDate(program, task, dateStr) {
+  if (!task.repeat?.enabled) {
+    return [{ ...task, programId: program.id, programName: program.name, baseTaskId: task.id, id: expandedTaskId(program.id, task.id, task.time) }];
+  }
+  const everyHours = Math.max(1, Number(task.repeat.everyHours || 8));
+  const out = [];
+  const current = new Date(`${dateStr}T${task.time || "00:00"}:00`);
+  const end = new Date(`${dateStr}T23:59:59`);
+  while (current <= end) {
+    const time = `${String(current.getHours()).padStart(2, "0")}:${String(current.getMinutes()).padStart(2, "0")}`;
+    out.push({
+      ...task,
+      id: expandedTaskId(program.id, task.id, time),
+      originalId: task.id,
+      baseTaskId: task.id,
+      programId: program.id,
+      programName: program.name,
+      time,
+      repeatInstance: true,
+    });
+    current.setHours(current.getHours() + everyHours);
+  }
+  return out;
+}
+function expandedTasksForDate(dateStr = todayKey(), programs = activePrograms()) {
+  return programs
+    .flatMap((program) => (program.tasks || []).flatMap((task) => expandTaskForDate(program, task, dateStr)))
+    .sort((a, b) => a.time.localeCompare(b.time) || String(a.programName).localeCompare(String(b.programName)));
 }
 function isAr() {
   return state.settings.lang === "arz";
@@ -449,21 +536,26 @@ function formatDateShort(dateStr) {
   return `${m}/${d}`;
 }
 function renderHero() {
-  const p = activeProgram();
-  $("#activeProgramTitle").textContent = p.name;
-  $("#programDates").textContent =
-    `${tr("from")} ${formatDateShort(p.start)} ${tr("to")} ${formatDateShort(p.end)}`;
+  const programs = activePrograms();
+  $("#activeProgramTitle").textContent = programs.map((p) => p.name).join(" + ");
+  $("#programDates").textContent = programs
+    .map((p) => `${p.name}: ${formatDateShort(p.start)} → ${formatDateShort(p.end)}`)
+    .join("  •  ");
 }
 function renderTimeline() {
-  const p = activeProgram();
-  const done = state.done[todayKey()] || {};
-  $("#timeline").innerHTML = [...p.tasks]
-    .sort((a, b) => a.time.localeCompare(b.time))
+  const dateStr = todayKey();
+  const tasks = expandedTasksForDate(dateStr);
+  const done = state.done[dateStr] || {};
+  $("#timeline").innerHTML = tasks
     .map(
       (t) => `
     <div class="task ${done[t.id] ? "done" : ""}">
       <button class="check" data-done="${t.id}" type="button" aria-label="done">${done[t.id] ? "✓" : ""}</button>
-      <div class="task-copy"><div class="task-title">${icon(t.type)} ${esc(field(t, "title"))}</div><div class="task-details">${esc(field(t, "details"))}</div></div>
+      <div class="task-copy">
+        <div class="task-title">${icon(t.type)} ${esc(field(t, "title"))}</div>
+        <div class="task-details">${activePrograms().length > 1 ? `<span class="program-badge">${esc(t.programName)}</span> ` : ""}${t.repeatInstance ? "🔁 " : ""}${esc(field(t, "details"))}</div>
+        <div class="task-actions"><button class="ghost mini-btn" data-gcal="${t.id}" type="button">📅 ${tr("addToGoogle")}</button></div>
+      </div>
       <div class="time">${formatTime(t.time)}</div>
     </div>`,
     )
@@ -478,6 +570,9 @@ function renderTimeline() {
         renderTimeline();
       }),
   );
+  $$('[data-gcal]').forEach((b) => {
+    b.onclick = () => openTaskInGoogleCalendar(b.dataset.gcal, todayKey());
+  });
 }
 function renderWater() {
   const arr = state.water[todayKey()] || Array(12).fill(false);
@@ -506,7 +601,7 @@ function renderPrograms() {
     <div class="program-card">
       <div><b>${esc(p.name)}</b><div class="task-details">${p.start || "—"} → ${p.end || "—"}</div></div>
       <div class="mini-actions">
-        <button class="ghost" data-active="${p.id}" type="button">${p.id === state.activeProgramId ? tr("active") : tr("activate")}</button>
+        <button class="ghost" data-active="${p.id}" type="button">${isProgramActive(p.id) ? tr("active") : tr("activate")}</button>
         <button class="ghost" data-edit="${p.id}" type="button">${tr("edit")}</button>
       </div>
     </div>`,
@@ -515,9 +610,7 @@ function renderPrograms() {
   $$("[data-active]").forEach(
     (b) =>
       (b.onclick = () => {
-        state.activeProgramId = b.dataset.active;
-        save();
-        render();
+        toggleProgramActive(b.dataset.active);
       }),
   );
   $$("[data-edit]").forEach(
@@ -571,6 +664,7 @@ function typeOptions(current) {
     .join("");
 }
 function taskForm(t) {
+  const repeat = t.repeat || { enabled: false, everyHours: 8 };
   return `
   <div class="task-edit" data-task-row="${t.id}">
     <div class="grid-form">
@@ -579,6 +673,12 @@ function taskForm(t) {
       <label>${tr("alarmType")}<select data-field="type">${typeOptions(t.type)}</select></label>
     </div>
     <label>${tr("alarmDetails")}<textarea data-field="details" rows="2">${esc(field(t, "details"))}</textarea></label>
+    <div class="repeat-row">
+      <label class="switch compact-switch"><input data-field="repeatEnabled" type="checkbox" ${repeat.enabled ? "checked" : ""} /> <span>🔁 ${tr("repeatEvery")}</span></label>
+      <input data-field="repeatEvery" type="number" min="1" max="24" step="1" value="${esc(repeat.everyHours || 8)}" aria-label="repeat hours" />
+      <span class="repeat-unit">${tr("repeatHours")}</span>
+    </div>
+    <p class="note">${tr("repeatHint")}</p>
     <button class="danger" data-del-task="${t.id}" type="button">${tr("delete")}</button>
   </div>`;
 }
@@ -612,6 +712,10 @@ function collectEditor() {
         titleEn: lang === "en" ? title : prev?.titleEn || title,
         detailsAr: lang === "arz" ? details : prev?.detailsAr || details,
         detailsEn: lang === "en" ? details : prev?.detailsEn || details,
+        repeat: {
+          enabled: !!row.querySelector("[data-field=repeatEnabled]")?.checked,
+          everyHours: Math.max(1, Number(row.querySelector("[data-field=repeatEvery]")?.value || 8)),
+        },
       };
     }),
   };
@@ -696,81 +800,64 @@ function dateWithTaskTime(date, task){
   out.setHours(h || 0, m || 0, 0, 0);
   return out;
 }
-function pad2(n){
-  return String(n).padStart(2, "0");
-}
-function icsLocalDate(dt){
-  // Local time, no Z. Android Calendar imports this more reliably as device-local time.
-  return `${dt.getFullYear()}${pad2(dt.getMonth() + 1)}${pad2(dt.getDate())}T${pad2(dt.getHours())}${pad2(dt.getMinutes())}00`;
-}
-function icsStamp(dt){
-  // UTC timestamp for DTSTAMP only.
+function icsDate(dt){
   return dt.toISOString().replace(/[-:]/g, "").replace(/\.\d{3}Z$/, "Z");
 }
 function icsEscape(v){
-  return String(v || "")
-    .replace(/\\/g,"\\\\")
-    .replace(/\r?\n/g,"\\n")
-    .replace(/,/g,"\\,")
-    .replace(/;/g,"\\;");
+  return String(v || "").replace(/\\/g,"\\\\").replace(/,/g,"\\,").replace(/;/g,"\\;").replace(/\n/g,"\\n");
 }
-function programCalendarEvents(program){
+function programCalendarEvents(programs = activePrograms()){
+  const list = Array.isArray(programs) ? programs : [programs];
   const events = [];
-  const days = datesBetween(program.start, program.end);
-  days.forEach(day => {
-    program.tasks.forEach(task => {
-      const start = dateWithTaskTime(day, task);
-      const end = new Date(start.getTime() + 10 * 60 * 1000);
-      events.push({program, task, start, end});
+  list.forEach((program) => {
+    const days = datesBetween(program.start, program.end);
+    days.forEach(day => {
+      const dateStr = toLocalDateInput(day);
+      expandedTasksForDate(dateStr, [program]).forEach(task => {
+        const start = dateWithTaskTime(day, task);
+        const end = new Date(start.getTime() + 15 * 60 * 1000);
+        events.push({program, task, start, end});
+      });
     });
   });
-  return events;
+  return events.sort((a,b)=>a.start-b.start);
 }
 function downloadActiveProgramCalendar(){
   const program = activeProgram();
-  const events = programCalendarEvents(program);
-
+  const events = programCalendarEvents(activePrograms());
   const lines = [
     "BEGIN:VCALENDAR",
     "VERSION:2.0",
     "PRODID:-//Diet Planner//Diet Reminders//EN",
     "CALSCALE:GREGORIAN",
     "METHOD:PUBLISH",
-    `X-WR-CALNAME:${icsEscape(program.name || "Diet Planner")}`,
-    "X-WR-TIMEZONE:Africa/Cairo",
   ];
-
   events.forEach(({task,start,end}) => {
     const title = `${icon(task.type)} ${field(task,"title")}`;
     const description = field(task,"details") || tr("reminder");
-
     lines.push(
       "BEGIN:VEVENT",
-      `UID:${task.id}-${icsLocalDate(start)}@diet-planner`,
-      `DTSTAMP:${icsStamp(new Date())}`,
-      `DTSTART:${icsLocalDate(start)}`,
-      `DTEND:${icsLocalDate(end)}`,
+      `UID:${task.id}-${start.getTime()}@diet-planner`,
+      `DTSTAMP:${icsDate(new Date())}`,
+      `DTSTART:${icsDate(start)}`,
+      `DTEND:${icsDate(end)}`,
       `SUMMARY:${icsEscape(title)}`,
       `DESCRIPTION:${icsEscape(description)}`,
       "BEGIN:VALARM",
       "ACTION:DISPLAY",
-      "TRIGGER:PT0S",
+      "TRIGGER:-PT0M",
       `DESCRIPTION:${icsEscape(title)}`,
       "END:VALARM",
       "END:VEVENT",
     );
   });
-
   lines.push("END:VCALENDAR");
-
-  const blob = new Blob([lines.join("\r\n") + "\r\n"], {type:"text/calendar;charset=utf-8"});
+  const blob = new Blob([lines.join("\r\n")], {type:"text/calendar;charset=utf-8"});
   const a = document.createElement("a");
   a.href = URL.createObjectURL(blob);
-  a.download = `${(program.name || "diet-program").replace(/[^a-zA-Z0-9_-]/g, "-")}-reminders.ics`;
-  document.body.appendChild(a);
+  a.download = `${activePrograms().map(p=>p.name).join("-") || "diet-program"}-reminders.ics`;
   a.click();
-  a.remove();
-  setTimeout(() => URL.revokeObjectURL(a.href), 1000);
+  URL.revokeObjectURL(a.href);
   showToast(tr("calendarDownloaded"));
 }
 function ntfySettings(){
@@ -787,19 +874,12 @@ async function sendNtfyMessage({title, body, at, priority="5", tags="alarm_clock
   const cfg = ntfySettings();
   const topic = cleanTopic(cfg.topic);
   if(!topic){ showToast(tr("ntfyTopicMissing")); return false; }
-
-  // Query params avoid custom headers, so the browser does not trigger CORS preflight.
-  const params = new URLSearchParams();
-  params.set("title", title || "Diet Planner");
-  params.set("priority", String(priority));
-  params.set("tags", tags || "alarm_clock");
-  if(at) params.set("at", String(Math.floor(at.getTime() / 1000)));
-
-  const res = await fetch(`${cleanNtfyServer(cfg.server)}/${topic}?${params.toString()}`, {
-    method:"POST",
-    body: body || title || "Diet Planner",
-  });
-
+  const url = new URL(`${cleanNtfyServer(cfg.server)}/${topic}`);
+  url.searchParams.set("title", title);
+  url.searchParams.set("priority", priority);
+  url.searchParams.set("tags", tags);
+  if(at) url.searchParams.set("at", String(Math.floor(at.getTime() / 1000)));
+  const res = await fetch(url.toString(), { method:"POST", body: body || title });
   if(!res.ok) throw new Error(`ntfy ${res.status}`);
   return true;
 }
@@ -859,6 +939,99 @@ function renderSettingsControls(){
   if(server) server.value = cleanNtfyServer(cfg.server);
   if(topic) topic.value = cfg.topic || "";
 }
+
+function googleDatePart(dateStr, timeStr){
+  const [y,m,d] = String(dateStr).split('-');
+  const [hh,mm] = String(timeStr || '00:00').split(':');
+  return `${y}${m}${d}T${hh}${mm}00`;
+}
+function addMinutesToDateTime(dateStr, timeStr, minutes=15){
+  const [y,m,d] = String(dateStr).split('-').map(Number);
+  const [hh,mm] = String(timeStr || '00:00').split(':').map(Number);
+  const dt = new Date(y, m - 1, d, hh || 0, mm || 0, 0, 0);
+  dt.setMinutes(dt.getMinutes() + minutes);
+  const yy = dt.getFullYear();
+  const mo = String(dt.getMonth() + 1).padStart(2,'0');
+  const da = String(dt.getDate()).padStart(2,'0');
+  const h = String(dt.getHours()).padStart(2,'0');
+  const mi = String(dt.getMinutes()).padStart(2,'0');
+  return `${yy}${mo}${da}T${h}${mi}00`;
+}
+function googleCalendarUrl(task, dateStr){
+  const title = `${icon(task.type)} ${field(task,'title')}`;
+  const details = field(task,'details') || tr('reminder');
+  const start = googleDatePart(dateStr, task.time);
+  const end = addMinutesToDateTime(dateStr, task.time, 15);
+  const params = new URLSearchParams({
+    action: 'TEMPLATE',
+    text: title,
+    dates: `${start}/${end}`,
+    details,
+    ctz: Intl.DateTimeFormat().resolvedOptions().timeZone || 'Africa/Cairo'
+  });
+  return `https://calendar.google.com/calendar/render?${params.toString()}`;
+}
+function openTaskInGoogleCalendar(taskId, dateStr){
+  const task = expandedTasksForDate(dateStr).find((t) => t.id === taskId);
+  if(!task) return;
+  window.open(googleCalendarUrl(task, dateStr), '_blank', 'noopener,noreferrer');
+}
+function renderGoogleCalendarLinks(){
+  const box = $('#googleCalendarLinks');
+  if(!box) return;
+  const dateStr = todayKey();
+  box.innerHTML = expandedTasksForDate(dateStr)
+    .map((task)=>`<a class="gcal-link" target="_blank" rel="noopener" href="${googleCalendarUrl(task,dateStr)}">📅 ${formatTime(task.time)} - ${activePrograms().length > 1 ? esc(task.programName) + ' - ' : ''}${esc(field(task,'title'))}</a>`)
+    .join('');
+}
+function markTaskDone(taskId, dateStr = todayKey()){
+  state.done[dateStr] ??= {};
+  state.done[dateStr][taskId] = true;
+  if(state.snoozes?.[dateStr]) delete state.snoozes[dateStr][taskId];
+  save();
+  renderTimeline();
+  showToast(tr('taskDone'));
+}
+function findTaskById(taskId, dateStr = todayKey()){
+  const expanded = expandedTasksForDate(dateStr, state.programs).find((t)=>t.id === taskId);
+  if(expanded) return expanded;
+  for(const program of state.programs){
+    const task = program.tasks.find((t)=>t.id === taskId || t.id === String(taskId).split("__")[1]);
+    if(task) return {...task, programId: program.id, programName: program.name, baseTaskId: task.id};
+  }
+  return null;
+}
+function snoozeTask(taskId, dateStr = todayKey()){
+  const task = findTaskById(taskId, dateStr);
+  if(!task) return;
+  state.snoozes ??= {};
+  state.snoozes[dateStr] ??= {};
+  const count = state.snoozes[dateStr][taskId] || 0;
+  if(count >= 3){
+    showToast(tr('snoozeLimit'));
+    return;
+  }
+  state.snoozes[dateStr][taskId] = count + 1;
+  save();
+  showToast(tr('snoozed'));
+  timers.push(setTimeout(()=>notifyTask(task, dateStr), 5 * 60 * 1000));
+}
+function handleAlarmAction(action, taskId, dateStr){
+  if(!taskId) return;
+  if(action === 'done') markTaskDone(taskId, dateStr || todayKey());
+  if(action === 'snooze') snoozeTask(taskId, dateStr || todayKey());
+}
+function handleAlarmActionFromUrl(){
+  const params = new URLSearchParams(location.search);
+  const action = params.get('alarmAction');
+  const taskId = params.get('taskId');
+  const dateStr = params.get('date') || todayKey();
+  if(action && taskId){
+    handleAlarmAction(action, taskId, dateStr);
+    history.replaceState({}, document.title, location.pathname + location.hash);
+  }
+}
+
 async function askNotify() {
   if (!("Notification" in window)) {
     showToast(tr("notSupported"));
@@ -874,7 +1047,7 @@ function scheduleTodayAlarms() {
   if (!("Notification" in window) || Notification.permission !== "granted")
     return;
   const now = new Date();
-  activeProgram().tasks.forEach((t) => {
+  expandedTasksForDate(todayKey()).forEach((t) => {
     const [h, m] = t.time.split(":").map(Number);
     const when = new Date();
     when.setHours(h, m, 0, 0);
@@ -883,23 +1056,37 @@ function scheduleTodayAlarms() {
       timers.push(setTimeout(() => notifyTask(t), diff));
   });
 }
-function notifyTask(t) {
+function notifyTask(t, dateStr = todayKey()) {
   if (state.settings.sound)
     $("#alarmAudio")
       .play()
       .catch(() => {});
   if (state.settings.vibrate && navigator.vibrate)
     navigator.vibrate([300, 120, 300]);
+
+  state.snoozes ??= {};
+  state.snoozes[dateStr] ??= {};
+  const snoozeCount = state.snoozes[dateStr][t.id] || 0;
   const title = `${icon(t.type)} ${field(t, "title")}`;
   const body = field(t, "details") || tr("reminder");
+  const actions = snoozeCount >= 3
+    ? [{ action: "done", title: tr("doneAction") }]
+    : [
+        { action: "done", title: tr("doneAction") },
+        { action: "snooze", title: tr("snoozeAction") },
+      ];
+  const payload = {
+    type: "NOTIFY",
+    title,
+    body,
+    tag: `diet-${dateStr}-${t.id}`,
+    actions,
+    requireInteraction: true,
+    data: { taskId: t.id, date: dateStr, snoozeCount },
+  };
   if (navigator.serviceWorker?.controller)
-    navigator.serviceWorker.controller.postMessage({
-      type: "NOTIFY",
-      title,
-      body,
-      tag: t.id,
-    });
-  else new Notification(title, { body, tag: t.id });
+    navigator.serviceWorker.controller.postMessage(payload);
+  else new Notification(title, { body, tag: payload.tag, actions, requireInteraction: true, data: payload.data });
 }
 
 $$(".tab").forEach(
@@ -925,6 +1112,7 @@ $("#notifyBtn").onclick = askNotify;
 $("#resetToday").onclick = () => {
   delete state.done[todayKey()];
   delete state.water[todayKey()];
+  delete state.snoozes?.[todayKey()];
   save();
   render();
 };
@@ -953,6 +1141,7 @@ $("#addTask").onclick = () => {
       titleEn: tr("newAlarm"),
       detailsAr: "",
       detailsEn: "",
+      repeat: { enabled: false, everyHours: 8 },
     }),
   );
   bindTaskDelete();
@@ -963,6 +1152,8 @@ $("#saveProgram").onclick = () => {
   if (i >= 0) state.programs[i] = p;
   else {
     state.programs.push(p);
+    state.activeProgramIds = Array.isArray(state.activeProgramIds) ? state.activeProgramIds : [];
+    state.activeProgramIds.push(p.id);
     state.activeProgramId = p.id;
   }
   save();
@@ -989,6 +1180,7 @@ $("#vibrateToggle").onchange = (e) => {
   save();
 };
 $("#downloadCalendar").onclick = downloadActiveProgramCalendar;
+$("#showGoogleLinks") && ($("#showGoogleLinks").onclick = renderGoogleCalendarLinks);
 $("#saveNtfy").onclick = () => {
   const cfg = ntfySettings();
   cfg.enabled = $("#ntfyEnabled").checked;

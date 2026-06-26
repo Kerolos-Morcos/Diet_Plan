@@ -81,6 +81,7 @@
           <h2 data-i18n="programs">البروجرامات</h2>
           <button id="addProgramBtn" class="primary" type="button" data-i18n="addProgram">ضيف P جديد</button>
         </div>
+        <p class="note" data-i18n="activeProgramsHint">ممكن تفعّل أكتر من بروجرام في نفس الوقت. لو منبهين في نفس المعاد، هيظهروا الاتنين بالترتيب.</p>
         <div id="programList" class="program-list"></div>
       </div>
 
@@ -123,7 +124,13 @@
         <div class="settings-block">
           <h3 data-i18n="calendarTitle">منبهات تقويم الموبايل</h3>
           <p class="note" data-i18n="calendarHint">نزّل ملف تقويم فيه مواعيد البروجرام، وافتحه بتطبيق التقويم عشان التذكيرات تشتغل حتى من غير نت.</p>
-          <button id="downloadCalendar" class="primary full" type="button" data-i18n="downloadCalendar">نزّل ملف التقويم</button>
+          <div class="calendar-note">
+            <h3 data-i18n="googleCalendarTitle">Google Calendar</h3>
+            <p class="note" data-i18n="googleCalendarHint">الروابط دي هتفتح Google Calendar ببيانات المنبه جاهزة. أنت بس بتدوس Save جوه Google Calendar.</p>
+            <button id="showGoogleLinks" class="primary full" type="button" data-i18n="addTodayGoogle">اعرض روابط Google Calendar للنهاردة</button>
+            <div id="googleCalendarLinks" class="google-links"></div>
+          </div>
+          <button id="downloadCalendar" class="ghost full" type="button" data-i18n="downloadCalendar">نزّل ملف التقويم</button>
         </div>
 
         <div class="settings-block">
@@ -142,6 +149,7 @@
         <button id="exportData" class="ghost full" type="button" data-i18n="exportBackup">صدّر نسخة احتياطية</button>
         <label class="import-label"><span data-i18n="importBackup">استورد نسخة احتياطية</span><input id="importData" type="file" accept="application/json" /></label>
         <button id="clearAll" class="danger full" type="button" data-i18n="clearAll">امسح كل البيانات المحلية</button>
+        <p class="note" data-i18n="storageAdvice">التخزين المحلي الحالي مناسب للبيانات الصغيرة. لو هتزيد صور وتاريخ طويل، الأفضل ننقل الصور والتاريخ لـ IndexedDB المجاني داخل نفس المتصفح.</p>
         <p class="note" data-i18n="notificationNote">ملحوظة: إشعارات الويب على الموبايل بتختلف حسب المتصفح. أفضل نتيجة لما تثبت التطبيق من Add to Home Screen وتسمح بالإشعارات.</p>
       </div>
     </section>
