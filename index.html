@@ -119,6 +119,26 @@
         <h2 data-i18n="settings">الإعدادات</h2>
         <label class="switch"><input id="soundToggle" type="checkbox" /> <span data-i18n="soundSetting">صوت تنبيه لو التطبيق مفتوح</span></label>
         <label class="switch"><input id="vibrateToggle" type="checkbox" /> <span data-i18n="vibrateSetting">اهتزاز الموبايل لو مدعوم</span></label>
+
+        <div class="settings-block">
+          <h3 data-i18n="calendarTitle">منبهات تقويم الموبايل</h3>
+          <p class="note" data-i18n="calendarHint">نزّل ملف تقويم فيه مواعيد البروجرام، وافتحه بتطبيق التقويم عشان التذكيرات تشتغل حتى من غير نت.</p>
+          <button id="downloadCalendar" class="primary full" type="button" data-i18n="downloadCalendar">نزّل ملف التقويم</button>
+        </div>
+
+        <div class="settings-block">
+          <h3 data-i18n="ntfyTitle">إشعارات ntfy احتياطي</h3>
+          <p class="note" data-i18n="ntfyHint">اختياري: لو عندك تطبيق ntfy، اكتب Topic وجدول إشعارات الـ 3 أيام الجاية. يحتاج نت وقت الجدولة ووقت وصول الإشعار.</p>
+          <label class="switch"><input id="ntfyEnabled" type="checkbox" /> <span data-i18n="ntfyEnabled">فعّل ntfy</span></label>
+          <label><span data-i18n="ntfyServer">رابط ntfy</span><input id="ntfyServer" inputmode="url" placeholder="https://ntfy.sh" /></label>
+          <label><span data-i18n="ntfyTopic">Topic خاص بيك</span><input id="ntfyTopic" autocomplete="off" data-i18n-placeholder="ntfyTopicPlaceholder" placeholder="مثال: diet-12345" /></label>
+          <div class="actions compact-actions">
+            <button id="saveNtfy" class="ghost" type="button" data-i18n="ntfySave">حفظ إعدادات ntfy</button>
+            <button id="testNtfy" class="ghost" type="button" data-i18n="ntfyTest">ابعت تجربة</button>
+            <button id="scheduleNtfy" class="primary" type="button" data-i18n="ntfySchedule">جدول إشعارات 3 أيام</button>
+          </div>
+        </div>
+
         <button id="exportData" class="ghost full" type="button" data-i18n="exportBackup">صدّر نسخة احتياطية</button>
         <label class="import-label"><span data-i18n="importBackup">استورد نسخة احتياطية</span><input id="importData" type="file" accept="application/json" /></label>
         <button id="clearAll" class="danger full" type="button" data-i18n="clearAll">امسح كل البيانات المحلية</button>

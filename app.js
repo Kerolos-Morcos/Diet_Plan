@@ -73,6 +73,24 @@ const i18n = {
     walk: "مشي",
     stop: "منع أكل",
     reminder: "ميعاد المنبه",
+    calendarTitle: "منبهات تقويم الموبايل",
+    calendarHint: "نزّل ملف تقويم فيه مواعيد البروجرام، وافتحه بتطبيق التقويم عشان التذكيرات تشتغل حتى من غير نت.",
+    downloadCalendar: "نزّل ملف التقويم",
+    ntfyTitle: "إشعارات ntfy احتياطي",
+    ntfyHint: "اختياري: لو عندك تطبيق ntfy، اكتب Topic وجدول إشعارات الـ 3 أيام الجاية. يحتاج نت وقت الجدولة ووقت وصول الإشعار.",
+    ntfyEnabled: "فعّل ntfy",
+    ntfyServer: "رابط ntfy",
+    ntfyTopic: "Topic خاص بيك",
+    ntfyTopicPlaceholder: "مثال: diet-12345",
+    ntfySave: "حفظ إعدادات ntfy",
+    ntfyTest: "ابعت تجربة",
+    ntfySchedule: "جدول إشعارات 3 أيام",
+    ntfyTopicMissing: "اكتب Topic الأول",
+    ntfySaved: "إعدادات ntfy اتحفظت ✅",
+    ntfyTestSent: "تجربة ntfy اتبعتت ✅",
+    ntfyScheduled: "تم جدولة إشعارات ntfy ✅",
+    ntfyFailed: "حصل خطأ في ntfy",
+    calendarDownloaded: "ملف التقويم اتنزّل ✅",
     kg: "كجم",
   },
   en: {
@@ -141,6 +159,24 @@ const i18n = {
     walk: "Walk",
     stop: "No food",
     reminder: "Reminder time",
+    calendarTitle: "Phone calendar alarms",
+    calendarHint: "Download a calendar file with this program reminders, then open it with your calendar app so reminders work offline.",
+    downloadCalendar: "Download calendar file",
+    ntfyTitle: "Backup ntfy notifications",
+    ntfyHint: "Optional: if you use the ntfy app, add your topic and schedule the next 3 days. It needs internet when scheduling and when receiving.",
+    ntfyEnabled: "Enable ntfy",
+    ntfyServer: "ntfy server URL",
+    ntfyTopic: "Your private topic",
+    ntfyTopicPlaceholder: "Example: diet-12345",
+    ntfySave: "Save ntfy settings",
+    ntfyTest: "Send test",
+    ntfySchedule: "Schedule next 3 days",
+    ntfyTopicMissing: "Enter a topic first",
+    ntfySaved: "ntfy settings saved ✅",
+    ntfyTestSent: "ntfy test sent ✅",
+    ntfyScheduled: "ntfy reminders scheduled ✅",
+    ntfyFailed: "ntfy error",
+    calendarDownloaded: "Calendar file downloaded ✅",
     kg: "kg",
   },
 };
@@ -263,7 +299,7 @@ const p1Tasks = [
 ];
 const defaultState = {
   activeProgramId: "p1",
-  settings: { sound: true, vibrate: true, theme: "light", lang: "arz" },
+  settings: { sound: true, vibrate: true, theme: "light", lang: "arz", ntfy:{enabled:false, server:"https://ntfy.sh", topic:""} },
   programs: [
     {
       id: "p1",
@@ -301,6 +337,7 @@ function mergeState(data) {
   const merged = structuredClone(defaultState);
   Object.assign(merged, data);
   merged.settings = { ...defaultState.settings, ...(data.settings || {}) };
+  merged.settings.ntfy = { ...defaultState.settings.ntfy, ...(data.settings?.ntfy || {}) };
   merged.programs = (
     data.programs?.length ? data.programs : defaultState.programs
   ).map(normalizeProgram);
@@ -398,6 +435,7 @@ function render() {
   renderPrograms();
   renderSnacks();
   renderWeights();
+  renderSettingsControls();
   scheduleTodayAlarms();
 }
 function formatDateShort(dateStr) {
@@ -632,6 +670,168 @@ function renderWeights() {
       .map((w) => `<li>${esc(w.date)}: ${esc(w.value)} ${tr("kg")}</li>`)
       .join("") || `<li class="note">${tr("noWeights")}</li>`;
 }
+
+function toLocalDateInput(date){
+  const y = date.getFullYear();
+  const m = String(date.getMonth() + 1).padStart(2, "0");
+  const d = String(date.getDate()).padStart(2, "0");
+  return `${y}-${m}-${d}`;
+}
+function parseDateOnly(str){
+  const [y,m,d] = String(str || "").split("-").map(Number);
+  if(!y || !m || !d) return null;
+  return new Date(y, m - 1, d);
+}
+function datesBetween(start, end){
+  const out = [];
+  const s = parseDateOnly(start);
+  const e = parseDateOnly(end || start);
+  if(!s || !e) return out;
+  for(let d = new Date(s); d <= e; d.setDate(d.getDate() + 1)) out.push(new Date(d));
+  return out;
+}
+function dateWithTaskTime(date, task){
+  const [h,m] = task.time.split(":").map(Number);
+  const out = new Date(date);
+  out.setHours(h || 0, m || 0, 0, 0);
+  return out;
+}
+function icsDate(dt){
+  return dt.toISOString().replace(/[-:]/g, "").replace(/\.\d{3}Z$/, "Z");
+}
+function icsEscape(v){
+  return String(v || "").replace(/\\/g,"\\\\").replace(/,/g,"\\,").replace(/;/g,"\\;").replace(/\n/g,"\\n");
+}
+function programCalendarEvents(program){
+  const events = [];
+  const days = datesBetween(program.start, program.end);
+  days.forEach(day => {
+    program.tasks.forEach(task => {
+      const start = dateWithTaskTime(day, task);
+      const end = new Date(start.getTime() + 15 * 60 * 1000);
+      events.push({program, task, start, end});
+    });
+  });
+  return events;
+}
+function downloadActiveProgramCalendar(){
+  const program = activeProgram();
+  const events = programCalendarEvents(program);
+  const lines = [
+    "BEGIN:VCALENDAR",
+    "VERSION:2.0",
+    "PRODID:-//Diet Planner//Diet Reminders//EN",
+    "CALSCALE:GREGORIAN",
+    "METHOD:PUBLISH",
+  ];
+  events.forEach(({task,start,end}) => {
+    const title = `${icon(task.type)} ${field(task,"title")}`;
+    const description = field(task,"details") || tr("reminder");
+    lines.push(
+      "BEGIN:VEVENT",
+      `UID:${task.id}-${start.getTime()}@diet-planner`,
+      `DTSTAMP:${icsDate(new Date())}`,
+      `DTSTART:${icsDate(start)}`,
+      `DTEND:${icsDate(end)}`,
+      `SUMMARY:${icsEscape(title)}`,
+      `DESCRIPTION:${icsEscape(description)}`,
+      "BEGIN:VALARM",
+      "ACTION:DISPLAY",
+      "TRIGGER:-PT0M",
+      `DESCRIPTION:${icsEscape(title)}`,
+      "END:VALARM",
+      "END:VEVENT",
+    );
+  });
+  lines.push("END:VCALENDAR");
+  const blob = new Blob([lines.join("\r\n")], {type:"text/calendar;charset=utf-8"});
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(blob);
+  a.download = `${program.name || "diet-program"}-reminders.ics`;
+  a.click();
+  URL.revokeObjectURL(a.href);
+  showToast(tr("calendarDownloaded"));
+}
+function ntfySettings(){
+  state.settings.ntfy ??= {enabled:false, server:"https://ntfy.sh", topic:""};
+  return state.settings.ntfy;
+}
+function cleanNtfyServer(v){
+  return String(v || "https://ntfy.sh").trim().replace(/\/+$/, "") || "https://ntfy.sh";
+}
+function cleanTopic(v){
+  return String(v || "").trim().replace(/[^a-zA-Z0-9_-]/g, "");
+}
+async function sendNtfyMessage({title, body, at, priority="5", tags="alarm_clock"}){
+  const cfg = ntfySettings();
+  const topic = cleanTopic(cfg.topic);
+  if(!topic){ showToast(tr("ntfyTopicMissing")); return false; }
+  const headers = {"Title": title, "Priority": priority, "Tags": tags};
+  if(at) headers.At = String(Math.floor(at.getTime() / 1000));
+  const res = await fetch(`${cleanNtfyServer(cfg.server)}/${topic}`, {
+    method:"POST",
+    headers,
+    body: body || title,
+  });
+  if(!res.ok) throw new Error(`ntfy ${res.status}`);
+  return true;
+}
+async function sendNtfyTest(){
+  try{
+    await sendNtfyMessage({
+      title: isAr() ? "تجربة Diet Planner" : "Diet Planner test",
+      body: isAr() ? "لو الإشعار وصل يبقى ntfy شغال ✅" : "If you got this, ntfy is working ✅",
+      priority:"4",
+      tags:"white_check_mark",
+    });
+    showToast(tr("ntfyTestSent"));
+  }catch(err){
+    console.error(err);
+    showToast(tr("ntfyFailed"));
+  }
+}
+function upcomingNtfyEvents(days = 3){
+  const now = new Date();
+  const limit = new Date(now.getTime() + days * 24 * 60 * 60 * 1000);
+  return programCalendarEvents(activeProgram())
+    .filter(e => e.start > now && e.start <= limit)
+    .sort((a,b) => a.start - b.start);
+}
+async function scheduleNtfyReminders(){
+  if(!ntfySettings().enabled){ showToast(tr("ntfySaved")); return; }
+  const events = upcomingNtfyEvents(3);
+  if(!events.length){ showToast(isAr() ? "مفيش منبهات قريبة للجدولة" : "No upcoming reminders to schedule"); return; }
+  let count = 0;
+  try{
+    for(const {task,start} of events){
+      await sendNtfyMessage({
+        title: `${icon(task.type)} ${field(task,"title")}`,
+        body: field(task,"details") || tr("reminder"),
+        at: start,
+        priority: task.type === "med" ? "5" : "4",
+        tags: task.type === "med" ? "pill,alarm_clock" : "alarm_clock",
+      });
+      count++;
+    }
+    showToast(`${tr("ntfyScheduled")} (${count})`);
+  }catch(err){
+    console.error(err);
+    showToast(tr("ntfyFailed"));
+  }
+}
+function renderSettingsControls(){
+  const cfg = ntfySettings();
+  const sound = $("#soundToggle");
+  const vibrate = $("#vibrateToggle");
+  const enabled = $("#ntfyEnabled");
+  const server = $("#ntfyServer");
+  const topic = $("#ntfyTopic");
+  if(sound) sound.checked = state.settings.sound;
+  if(vibrate) vibrate.checked = state.settings.vibrate;
+  if(enabled) enabled.checked = !!cfg.enabled;
+  if(server) server.value = cleanNtfyServer(cfg.server);
+  if(topic) topic.value = cfg.topic || "";
+}
 async function askNotify() {
   if (!("Notification" in window)) {
     showToast(tr("notSupported"));
@@ -761,6 +961,32 @@ $("#vibrateToggle").onchange = (e) => {
   state.settings.vibrate = e.target.checked;
   save();
 };
+$("#downloadCalendar").onclick = downloadActiveProgramCalendar;
+$("#saveNtfy").onclick = () => {
+  const cfg = ntfySettings();
+  cfg.enabled = $("#ntfyEnabled").checked;
+  cfg.server = cleanNtfyServer($("#ntfyServer").value);
+  cfg.topic = cleanTopic($("#ntfyTopic").value);
+  $("#ntfyTopic").value = cfg.topic;
+  save();
+  showToast(tr("ntfySaved"));
+};
+$("#testNtfy").onclick = async () => {
+  const cfg = ntfySettings();
+  cfg.enabled = $("#ntfyEnabled").checked;
+  cfg.server = cleanNtfyServer($("#ntfyServer").value);
+  cfg.topic = cleanTopic($("#ntfyTopic").value);
+  save();
+  await sendNtfyTest();
+};
+$("#scheduleNtfy").onclick = async () => {
+  const cfg = ntfySettings();
+  cfg.enabled = $("#ntfyEnabled").checked;
+  cfg.server = cleanNtfyServer($("#ntfyServer").value);
+  cfg.topic = cleanTopic($("#ntfyTopic").value);
+  save();
+  await scheduleNtfyReminders();
+};
 $("#exportData").onclick = () => {
   const a = document.createElement("a");
   a.href = URL.createObjectURL(
@@ -821,6 +1047,5 @@ if ("serviceWorker" in navigator) {
     window.location.reload();
   });
 }
-$("#soundToggle").checked = state.settings.sound;
-$("#vibrateToggle").checked = state.settings.vibrate;
+renderSettingsControls();
 render();
