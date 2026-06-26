@@ -696,11 +696,23 @@ function dateWithTaskTime(date, task){
   out.setHours(h || 0, m || 0, 0, 0);
   return out;
 }
-function icsDate(dt){
+function pad2(n){
+  return String(n).padStart(2, "0");
+}
+function icsLocalDate(dt){
+  // Local time, no Z. Android Calendar imports this more reliably as device-local time.
+  return `${dt.getFullYear()}${pad2(dt.getMonth() + 1)}${pad2(dt.getDate())}T${pad2(dt.getHours())}${pad2(dt.getMinutes())}00`;
+}
+function icsStamp(dt){
+  // UTC timestamp for DTSTAMP only.
   return dt.toISOString().replace(/[-:]/g, "").replace(/\.\d{3}Z$/, "Z");
 }
 function icsEscape(v){
-  return String(v || "").replace(/\\/g,"\\\\").replace(/,/g,"\\,").replace(/;/g,"\\;").replace(/\n/g,"\\n");
+  return String(v || "")
+    .replace(/\\/g,"\\\\")
+    .replace(/\r?\n/g,"\\n")
+    .replace(/,/g,"\\,")
+    .replace(/;/g,"\\;");
 }
 function programCalendarEvents(program){
   const events = [];
@@ -708,7 +720,7 @@ function programCalendarEvents(program){
   days.forEach(day => {
     program.tasks.forEach(task => {
       const start = dateWithTaskTime(day, task);
-      const end = new Date(start.getTime() + 15 * 60 * 1000);
+      const end = new Date(start.getTime() + 10 * 60 * 1000);
       events.push({program, task, start, end});
     });
   });
@@ -717,39 +729,48 @@ function programCalendarEvents(program){
 function downloadActiveProgramCalendar(){
   const program = activeProgram();
   const events = programCalendarEvents(program);
+
   const lines = [
     "BEGIN:VCALENDAR",
     "VERSION:2.0",
     "PRODID:-//Diet Planner//Diet Reminders//EN",
     "CALSCALE:GREGORIAN",
     "METHOD:PUBLISH",
+    `X-WR-CALNAME:${icsEscape(program.name || "Diet Planner")}`,
+    "X-WR-TIMEZONE:Africa/Cairo",
   ];
+
   events.forEach(({task,start,end}) => {
     const title = `${icon(task.type)} ${field(task,"title")}`;
     const description = field(task,"details") || tr("reminder");
+
     lines.push(
       "BEGIN:VEVENT",
-      `UID:${task.id}-${start.getTime()}@diet-planner`,
-      `DTSTAMP:${icsDate(new Date())}`,
-      `DTSTART:${icsDate(start)}`,
-      `DTEND:${icsDate(end)}`,
+      `UID:${task.id}-${icsLocalDate(start)}@diet-planner`,
+      `DTSTAMP:${icsStamp(new Date())}`,
+      `DTSTART:${icsLocalDate(start)}`,
+      `DTEND:${icsLocalDate(end)}`,
       `SUMMARY:${icsEscape(title)}`,
       `DESCRIPTION:${icsEscape(description)}`,
       "BEGIN:VALARM",
       "ACTION:DISPLAY",
-      "TRIGGER:-PT0M",
+      "TRIGGER:PT0S",
       `DESCRIPTION:${icsEscape(title)}`,
       "END:VALARM",
       "END:VEVENT",
     );
   });
+
   lines.push("END:VCALENDAR");
-  const blob = new Blob([lines.join("\r\n")], {type:"text/calendar;charset=utf-8"});
+
+  const blob = new Blob([lines.join("\r\n") + "\r\n"], {type:"text/calendar;charset=utf-8"});
   const a = document.createElement("a");
   a.href = URL.createObjectURL(blob);
-  a.download = `${program.name || "diet-program"}-reminders.ics`;
+  a.download = `${(program.name || "diet-program").replace(/[^a-zA-Z0-9_-]/g, "-")}-reminders.ics`;
+  document.body.appendChild(a);
   a.click();
-  URL.revokeObjectURL(a.href);
+  a.remove();
+  setTimeout(() => URL.revokeObjectURL(a.href), 1000);
   showToast(tr("calendarDownloaded"));
 }
 function ntfySettings(){
@@ -766,13 +787,19 @@ async function sendNtfyMessage({title, body, at, priority="5", tags="alarm_clock
   const cfg = ntfySettings();
   const topic = cleanTopic(cfg.topic);
   if(!topic){ showToast(tr("ntfyTopicMissing")); return false; }
-  const headers = {"Title": title, "Priority": priority, "Tags": tags};
-  if(at) headers.At = String(Math.floor(at.getTime() / 1000));
-  const res = await fetch(`${cleanNtfyServer(cfg.server)}/${topic}`, {
+
+  // Query params avoid custom headers, so the browser does not trigger CORS preflight.
+  const params = new URLSearchParams();
+  params.set("title", title || "Diet Planner");
+  params.set("priority", String(priority));
+  params.set("tags", tags || "alarm_clock");
+  if(at) params.set("at", String(Math.floor(at.getTime() / 1000)));
+
+  const res = await fetch(`${cleanNtfyServer(cfg.server)}/${topic}?${params.toString()}`, {
     method:"POST",
-    headers,
-    body: body || title,
+    body: body || title || "Diet Planner",
   });
+
   if(!res.ok) throw new Error(`ntfy ${res.status}`);
   return true;
 }
