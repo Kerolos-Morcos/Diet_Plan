@@ -13,11 +13,11 @@ const i18n = {
     install: "تثبيت",
     activeProgram: "البروجرام الحالي",
     enableNotifications: "فعّل الإشعارات",
-    today: "النهارده",
+    today: "النهاردة",
     programs: "البروجرامات",
     snacks: "الاسناكس",
     settings: "الإعدادات",
-    todayAlarms: "منبهات النهارده",
+    todayAlarms: "منبهات النهاردة",
     resetToday: "صفّر اليوم",
     waterTitle: "المياه - 12 كوباية",
     waterHint: "منهم ٢ كوباية قبل كل وجبة.",
@@ -402,12 +402,13 @@ function render() {
 }
 function formatDateShort(dateStr) {
   if (!dateStr) return "—";
+
   const parts = dateStr.split("-");
   if (parts.length !== 3) return dateStr;
-  const [y, m, d] = parts;
-  return isAr()
-    ? `${Number(d)}/${Number(m)}`
-    : `${Number(m)}/${Number(d)}/${String(y).slice(2)}`;
+
+  const [, m, d] = parts;
+
+  return `${m}/${d}`;
 }
 function renderHero() {
   const p = activeProgram();
