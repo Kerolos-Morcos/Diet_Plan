@@ -2,7 +2,13 @@ const KEY = "DietPwa.v2";
 const oldKey = "DietPwa.v1";
 const $ = (s) => document.querySelector(s);
 const $$ = (s) => [...document.querySelectorAll(s)];
-const todayKey = () => new Date().toISOString().slice(0, 10);
+const todayKey = () => {
+  const d = new Date();
+  const y = d.getFullYear();
+  const m = String(d.getMonth() + 1).padStart(2, "0");
+  const day = String(d.getDate()).padStart(2, "0");
+  return `${y}-${m}-${day}`;
+};
 const uid = () =>
   crypto.randomUUID ? crypto.randomUUID() : String(Date.now() + Math.random());
 
@@ -1434,14 +1440,13 @@ $("#installBtn").onclick = async () => {
 };
 if ("serviceWorker" in navigator) {
   navigator.serviceWorker.register("./sw.js").then((reg) => {
+    reg.update();
+
     reg.addEventListener("updatefound", () => {
       const worker = reg.installing;
 
       worker?.addEventListener("statechange", () => {
-        if (
-          worker.state === "installed" &&
-          navigator.serviceWorker.controller
-        ) {
+        if (worker.state === "installed" && navigator.serviceWorker.controller) {
           worker.postMessage({ type: "SKIP_WAITING" });
         }
       });
