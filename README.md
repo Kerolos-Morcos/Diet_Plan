@@ -1,4 +1,4 @@
-# Kerolos Diet Planner PWA
+# Diet Planner PWA
 
 Static mobile-first diet, medication, water and snack-image planner.
 
