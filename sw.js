@@ -1,5 +1,4 @@
-const CACHE = "diet-pwa-v10";
-
+const CACHE = "diet-pwa-v5";
 const ASSETS = [
   "./",
   "./index.html",
@@ -10,9 +9,7 @@ const ASSETS = [
 ];
 
 self.addEventListener("install", (e) => {
-  e.waitUntil(
-    caches.open(CACHE).then((cache) => cache.addAll(ASSETS))
-  );
+  e.waitUntil(caches.open(CACHE).then((cache) => cache.addAll(ASSETS)));
   self.skipWaiting();
 });
 
@@ -37,9 +34,7 @@ self.addEventListener("fetch", (e) => {
     caches.match(e.request).then((cached) => {
       if (cached) return cached;
 
-      return fetch(e.request).then((res) => {
-        return res;
-      });
+      return fetch(e.request).catch(() => caches.match("./index.html"));
     })
   );
 });

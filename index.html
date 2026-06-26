@@ -1,271 +1,136 @@
 <!doctype html>
 <html lang="ar-EG" dir="rtl" data-theme="light">
-  <head>
-    <meta charset="UTF-8" />
-    <meta
-      name="viewport"
-      content="width=device-width, initial-scale=1, viewport-fit=cover"
-    />
-    <meta name="theme-color" content="#5f8f73" />
-    <meta
-      name="description"
-      content="Diet Planner - PWA diet, meds, water and snack tracker."
-    />
-    <title>Diet Planner</title>
-    <link rel="manifest" href="manifest.webmanifest" />
-    <link rel="icon" type="image/png" href="./favicon.png" />
-    <link rel="apple-touch-icon" href="./favicon.png" />
-    <link rel="stylesheet" href="styles.css" />
-  </head>
-  <body>
-    <header class="topbar">
-      <div class="brand">
-        <span class="logo">🥗</span>
-        <div>
-          <p class="eyebrow" data-i18n="appSubtitle">دايت + أدوية + منبهات</p>
-          <h1 data-i18n="appTitle">Diet Planner</h1>
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="theme-color" content="#5f8f73" />
+  <meta name="description" content="Diet Planner - PWA diet, meds, water and snack tracker." />
+  <title>Diet Planner</title>
+  <link rel="manifest" href="manifest.webmanifest" />
+  <link rel="icon" type="image/png" href="./favicon.png" />
+  <link rel="apple-touch-icon" href="./favicon.png" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand">
+      <span class="logo">🥗</span>
+      <div>
+        <p class="eyebrow" data-i18n="appSubtitle">دايت + أدوية + منبهات</p>
+        <h1 data-i18n="appTitle">Diet Planner</h1>
+      </div>
+    </div>
+    <div class="top-actions">
+      <button id="langToggle" class="chip" type="button">EN</button>
+      <button id="themeToggle" class="chip" type="button" aria-label="Theme">🌙</button>
+      <button id="installBtn" class="chip hidden" type="button" data-i18n="install">تثبيت</button>
+    </div>
+  </header>
+
+  <main class="app">
+    <section class="card hero reveal">
+      <div>
+        <p class="eyebrow" data-i18n="activeProgram">البروجرام الحالي</p>
+        <h2 id="activeProgramTitle">P1</h2>
+        <p id="programDates">حتى يوم 5/7</p>
+      </div>
+      <button id="notifyBtn" class="primary" type="button" data-i18n="enableNotifications">فعّل الإشعارات</button>
+    </section>
+
+    <nav class="tabs" aria-label="Navigation">
+      <button class="tab active" data-tab="today" type="button" data-i18n="today">النهاردة</button>
+      <button class="tab" data-tab="programs" type="button" data-i18n="programs">البروجرامات</button>
+      <button class="tab" data-tab="snacks" type="button" data-i18n="snacks">الاسناكس</button>
+      <button class="tab" data-tab="settings" type="button" data-i18n="settings">الإعدادات</button>
+    </nav>
+
+    <section id="today" class="page active">
+      <div class="card reveal">
+        <div class="section-head">
+          <h2 data-i18n="todayAlarms">منبهات النهاردة</h2>
+          <button id="resetToday" class="ghost" type="button" data-i18n="resetToday">صفّر اليوم</button>
+        </div>
+        <div id="timeline" class="timeline"></div>
+      </div>
+
+      <div class="card water-card reveal">
+        <div class="section-head">
+          <div>
+            <h2 data-i18n="waterTitle">المياه - 12 كوباية</h2>
+            <p data-i18n="waterHint">منهم ٢ كوباية قبل كل وجبة.</p>
+          </div>
+          <strong id="waterCount" class="pill">0/12</strong>
+        </div>
+        <div id="waterGrid" class="water-grid"></div>
+      </div>
+
+      <div class="card reveal">
+        <h2 data-i18n="weightTitle">الميزان</h2>
+        <p data-i18n="weightHint">بس في الميعاد اللي الدكتور محدده، قبل الفطار وبعد الحمام، ومن غير أكل أو شرب.</p>
+        <div class="form-row">
+          <input id="weightInput" type="number" step="0.1" inputmode="decimal" data-i18n-placeholder="weightPlaceholder" placeholder="اكتب الوزن" />
+          <button id="saveWeight" class="primary" type="button" data-i18n="save">حفظ</button>
+        </div>
+        <ul id="weightList" class="simple-list"></ul>
+      </div>
+    </section>
+
+    <section id="programs" class="page">
+      <div class="card reveal">
+        <div class="section-head">
+          <h2 data-i18n="programs">البروجرامات</h2>
+          <button id="addProgramBtn" class="primary" type="button" data-i18n="addProgram">ضيف P جديد</button>
+        </div>
+        <div id="programList" class="program-list"></div>
+      </div>
+
+      <div id="programEditor" class="card reveal hidden">
+        <h2 id="editorTitle">تعديل البروجرام</h2>
+        <div class="grid-form">
+          <label><span data-i18n="programName">اسم البروجرام</span><input id="programName" placeholder="P2" /></label>
+          <label><span data-i18n="startDate">تاريخ البداية</span><input id="programStart" type="date" /></label>
+          <label><span data-i18n="endDate">تاريخ النهاية</span><input id="programEnd" type="date" /></label>
+        </div>
+        <label><span data-i18n="instructions">التعليمات</span><textarea id="programInstructions" rows="5"></textarea></label>
+        <h3 data-i18n="tasks">المهام والمنبهات</h3>
+        <div id="taskEditor"></div>
+        <button id="addTask" class="ghost" type="button" data-i18n="addAlarm">+ ضيف منبه</button>
+        <div class="actions">
+          <button id="saveProgram" class="primary" type="button" data-i18n="saveProgram">حفظ البروجرام</button>
+          <button id="cancelProgram" class="ghost" type="button" data-i18n="cancel">إلغاء</button>
         </div>
       </div>
-      <div class="top-actions">
-        <button id="langToggle" class="chip" type="button">EN</button>
-        <button id="themeToggle" class="chip" type="button" aria-label="Theme">
-          🌙
-        </button>
-        <button
-          id="installBtn"
-          class="chip hidden"
-          type="button"
-          data-i18n="install"
-        >
-          تثبيت
-        </button>
+    </section>
+
+    <section id="snacks" class="page">
+      <div class="card reveal">
+        <h2 data-i18n="snackImages">صور الاسناكس والجبن</h2>
+        <p data-i18n="snackHint">ارفع الصور اللي الدكتور بعتها. التطبيق هيضغطها ويحفظها على الموبايل.</p>
+        <label class="upload-box">
+          <span data-i18n="uploadSnacks">ارفع صور الاسناكس</span>
+          <input id="snackUpload" type="file" accept="image/*" multiple />
+        </label>
+        <div id="snackGallery" class="gallery"></div>
       </div>
-    </header>
+    </section>
 
-    <main class="app">
-      <section class="card hero reveal">
-        <div>
-          <p class="eyebrow" data-i18n="activeProgram">البروجرام الحالي</p>
-          <h2 id="activeProgramTitle">P1</h2>
-          <p id="programDates">حتى يوم 5/7</p>
-        </div>
-        <button
-          id="notifyBtn"
-          class="primary"
-          type="button"
-          data-i18n="enableNotifications"
-        >
-          فعّل الإشعارات
-        </button>
-      </section>
+    <section id="settings" class="page">
+      <div class="card reveal">
+        <h2 data-i18n="settings">الإعدادات</h2>
+        <label class="switch"><input id="soundToggle" type="checkbox" /> <span data-i18n="soundSetting">صوت تنبيه لو التطبيق مفتوح</span></label>
+        <label class="switch"><input id="vibrateToggle" type="checkbox" /> <span data-i18n="vibrateSetting">اهتزاز الموبايل لو مدعوم</span></label>
+        <button id="exportData" class="ghost full" type="button" data-i18n="exportBackup">صدّر نسخة احتياطية</button>
+        <label class="import-label"><span data-i18n="importBackup">استورد نسخة احتياطية</span><input id="importData" type="file" accept="application/json" /></label>
+        <button id="clearAll" class="danger full" type="button" data-i18n="clearAll">امسح كل البيانات المحلية</button>
+        <p class="note" data-i18n="notificationNote">ملحوظة: إشعارات الويب على الموبايل بتختلف حسب المتصفح. أفضل نتيجة لما تثبت التطبيق من Add to Home Screen وتسمح بالإشعارات.</p>
+      </div>
+    </section>
+  </main>
 
-      <nav class="tabs" aria-label="Navigation">
-        <button
-          class="tab active"
-          data-tab="today"
-          type="button"
-          data-i18n="today"
-        >
-          النهارده
-        </button>
-        <button
-          class="tab"
-          data-tab="programs"
-          type="button"
-          data-i18n="programs"
-        >
-          البروجرامات
-        </button>
-        <button class="tab" data-tab="snacks" type="button" data-i18n="snacks">
-          الاسناكس
-        </button>
-        <button
-          class="tab"
-          data-tab="settings"
-          type="button"
-          data-i18n="settings"
-        >
-          الإعدادات
-        </button>
-      </nav>
-
-      <section id="today" class="page active">
-        <div class="card reveal">
-          <div class="section-head">
-            <h2 data-i18n="todayAlarms">منبهات النهارده</h2>
-            <button
-              id="resetToday"
-              class="ghost"
-              type="button"
-              data-i18n="resetToday"
-            >
-              صفّر اليوم
-            </button>
-          </div>
-          <div id="timeline" class="timeline"></div>
-        </div>
-
-        <div class="card water-card reveal">
-          <div class="section-head">
-            <div>
-              <h2 data-i18n="waterTitle">المياه - 12 كوباية</h2>
-              <p data-i18n="waterHint">منهم ٢ كوباية قبل كل وجبة.</p>
-            </div>
-            <strong id="waterCount" class="pill">0/12</strong>
-          </div>
-          <div id="waterGrid" class="water-grid"></div>
-        </div>
-
-        <div class="card reveal">
-          <h2 data-i18n="weightTitle">الميزان</h2>
-          <p data-i18n="weightHint">
-            بس في الميعاد اللي الدكتور محدده، قبل الفطار وبعد الحمام، ومن غير
-            أكل أو شرب.
-          </p>
-          <div class="form-row">
-            <input
-              id="weightInput"
-              type="number"
-              step="0.1"
-              inputmode="decimal"
-              data-i18n-placeholder="weightPlaceholder"
-              placeholder="اكتب الوزن"
-            />
-            <button
-              id="saveWeight"
-              class="primary"
-              type="button"
-              data-i18n="save"
-            >
-              حفظ
-            </button>
-          </div>
-          <ul id="weightList" class="simple-list"></ul>
-        </div>
-      </section>
-
-      <section id="programs" class="page">
-        <div class="card reveal">
-          <div class="section-head">
-            <h2 data-i18n="programs">البروجرامات</h2>
-            <button
-              id="addProgramBtn"
-              class="primary"
-              type="button"
-              data-i18n="addProgram"
-            >
-              ضيف P جديد
-            </button>
-          </div>
-          <div id="programList" class="program-list"></div>
-        </div>
-
-        <div id="programEditor" class="card reveal hidden">
-          <h2 id="editorTitle">تعديل البروجرام</h2>
-          <div class="grid-form">
-            <label>
-              <span data-i18n="programName">اسم البروجرام</span>
-              <input id="programName" placeholder="P2" />
-            </label>
-            <label>
-              <span data-i18n="startDate">تاريخ البداية</span>
-              <input id="programStart" type="date" />
-            </label>
-            <label>
-              <span data-i18n="endDate">تاريخ النهاية</span>
-              <input id="programEnd" type="date" />
-            </label>
-          </div>
-          <label>
-            <span data-i18n="instructions">التعليمات</span>
-            <textarea id="programInstructions" rows="5"></textarea>
-          </label>
-          <h3 data-i18n="tasks">المهام والمنبهات</h3>
-          <div id="taskEditor"></div>
-          <button id="addTask" class="ghost" type="button" data-i18n="addAlarm">
-            + ضيف منبه
-          </button>
-          <div class="actions">
-            <button
-              id="saveProgram"
-              class="primary"
-              type="button"
-              data-i18n="saveProgram"
-            >
-              حفظ البروجرام
-            </button>
-            <button
-              id="cancelProgram"
-              class="ghost"
-              type="button"
-              data-i18n="cancel"
-            >
-              إلغاء
-            </button>
-          </div>
-        </div>
-      </section>
-
-      <section id="snacks" class="page">
-        <div class="card reveal">
-          <h2 data-i18n="snackImages">صور الاسناكس والجبن</h2>
-          <p data-i18n="snackHint">
-            ارفع الصور اللي الدكتور بعتها. التطبيق هيضغطها ويحفظها على الموبايل.
-          </p>
-          <label class="upload-box">
-            <span data-i18n="uploadSnacks">ارفع صور الاسناكس</span>
-            <input id="snackUpload" type="file" accept="image/*" multiple />
-          </label>
-          <div id="snackGallery" class="gallery"></div>
-        </div>
-      </section>
-
-      <section id="settings" class="page">
-        <div class="card reveal">
-          <h2 data-i18n="settings">الإعدادات</h2>
-          <label class="switch">
-            <input id="soundToggle" type="checkbox" />
-            <span data-i18n="soundSetting">صوت تنبيه لو التطبيق مفتوح</span>
-          </label>
-          <label class="switch">
-            <input id="vibrateToggle" type="checkbox" />
-            <span data-i18n="vibrateSetting">اهتزاز الموبايل لو مدعوم</span>
-          </label>
-          <button
-            id="exportData"
-            class="ghost full"
-            type="button"
-            data-i18n="exportBackup"
-          >
-            صدّر نسخة احتياطية
-          </button>
-          <label class="import-label">
-            <span data-i18n="importBackup">استورد نسخة احتياطية</span>
-            <input id="importData" type="file" accept="application/json" />
-          </label>
-          <button
-            id="clearAll"
-            class="danger full"
-            type="button"
-            data-i18n="clearAll"
-          >
-            امسح كل البيانات المحلية
-          </button>
-          <p class="note" data-i18n="notificationNote">
-            ملحوظة: إشعارات الويب على الموبايل بتختلف حسب المتصفح. أفضل نتيجة
-            لما تثبت التطبيق من Add to Home Screen وتسمح بالإشعارات.
-          </p>
-        </div>
-      </section>
-    </main>
-
-    <div id="toast" class="toast hidden"></div>
-    <audio id="alarmAudio" preload="auto">
-      <source
-        src="data:audio/wav;base64,UklGRjIAAABXQVZFZm10IBAAAAABAAEAESsAACJWAAACABAAZGF0YQ4AAAD//wAA//8AAP//AAD//wAA//8AAA=="
-        type="audio/wav"
-      />
-    </audio>
-    <script src="app.js"></script>
-  </body>
+  <div id="toast" class="toast hidden"></div>
+  <audio id="alarmAudio" preload="auto">
+    <source src="data:audio/wav;base64,UklGRjIAAABXQVZFZm10IBAAAAABAAEAESsAACJWAAACABAAZGF0YQ4AAAD//wAA//8AAP//AAD//wAA//8AAA==" type="audio/wav">
+  </audio>
+  <script src="app.js"></script>
+</body>
 </html>
