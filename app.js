@@ -109,10 +109,17 @@ function applyTheme(){
   $('#themeToggle').textContent = state.settings.theme === 'dark' ? '☀️' : '🌙';
 }
 function render(){ applyLocale(); applyTheme(); renderHero(); renderTimeline(); renderWater(); renderPrograms(); renderSnacks(); renderWeights(); scheduleTodayAlarms(); }
+function formatDateShort(dateStr){
+  if(!dateStr) return '—';
+  const parts = dateStr.split('-');
+  if(parts.length !== 3) return dateStr;
+  const [y,m,d] = parts;
+  return isAr() ? `${Number(d)}/${Number(m)}` : `${Number(m)}/${Number(d)}/${String(y).slice(2)}`;
+}
 function renderHero(){
   const p = activeProgram();
   $('#activeProgramTitle').textContent = p.name;
-  $('#programDates').textContent = `${tr('from')} ${p.start || '—'} ${tr('to')} ${p.end || '—'}`;
+  $('#programDates').textContent = `${tr('from')} ${formatDateShort(p.start)} ${tr('to')} ${formatDateShort(p.end)}`;
 }
 function renderTimeline(){
   const p = activeProgram();
