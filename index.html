@@ -48,7 +48,7 @@
       <div class="card reveal">
         <div class="section-head">
           <h2 data-i18n="todayAlarms">منبهات النهاردة</h2>
-          <button id="resetToday" class="ghost" style="margin-bottom: 15px;" type="button" data-i18n="resetToday">صفّر اليوم</button>
+          <button id="resetToday" class="ghost" style="margin-bottom: 16px;" type="button" data-i18n="resetToday">صفّر اليوم</button>
         </div>
         <div id="timeline" class="timeline"></div>
       </div>
@@ -127,6 +127,15 @@
           <div class="calendar-note">
             <h3 data-i18n="googleCalendarTitle">Google Calendar</h3>
             <p class="note" data-i18n="googleCalendarHint">الروابط دي هتفتح Google Calendar ببيانات المنبه جاهزة. أنت بس بتدوس Save جوه Google Calendar.</p>
+            <p class="note" data-i18n="googleOAuthHint">اربط حساب Google عشان التطبيق يضيف/يحدّث منبهاتك في Google Calendar تلقائيًا. هيتم إضافة أحداث للمنبهات فقط.</p>
+            <p id="googleStatus" class="sync-status"></p>
+            <div class="actions compact-actions">
+              <button id="connectGoogle" class="ghost" type="button" data-i18n="googleConnect">اربط Google Calendar</button>
+              <button id="syncGoogle" class="primary" type="button" data-i18n="googleSyncActive">زامن البروجرامات المتفعلة</button>
+              <button id="resyncGoogle" class="ghost" type="button" data-i18n="googleResync">إعادة مزامنة</button>
+              <button id="removeGoogleEvents" class="danger" type="button" data-i18n="googleRemoveSynced">امسح الأحداث المتزامنة</button>
+            </div>
+            <h4 data-i18n="googleManualLinks">روابط الإضافة اليدوية</h4>
             <button id="showGoogleLinks" class="primary full" type="button" data-i18n="addTodayGoogle">اعرض روابط Google Calendar للنهاردة</button>
             <div id="googleCalendarLinks" class="google-links"></div>
           </div>
@@ -159,6 +168,7 @@
   <audio id="alarmAudio" preload="auto">
     <source src="data:audio/wav;base64,UklGRjIAAABXQVZFZm10IBAAAAABAAEAESsAACJWAAACABAAZGF0YQ4AAAD//wAA//8AAP//AAD//wAA//8AAA==" type="audio/wav">
   </audio>
+  <script src="https://accounts.google.com/gsi/client" async defer></script>
   <script src="app.js"></script>
 </body>
 </html>

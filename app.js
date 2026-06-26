@@ -6,6 +6,12 @@ const todayKey = () => new Date().toISOString().slice(0, 10);
 const uid = () =>
   crypto.randomUUID ? crypto.randomUUID() : String(Date.now() + Math.random());
 
+const GOOGLE_CLIENT_ID = "110233627128-jdtg0u6rgejf7h5fbek78nkd2co6n5s2.apps.googleusercontent.com";
+const GOOGLE_API_KEY = "AIzaSyA-AMiF8P6QCJyx1jSwW10kdHh0KsppRV4";
+const GOOGLE_CALENDAR_SCOPE = "https://www.googleapis.com/auth/calendar.events";
+let googleTokenClient = null;
+let googleAccessToken = null;
+
 const i18n = {
   arz: {
     appSubtitle: "دايت + أدوية + منبهات",
@@ -95,6 +101,19 @@ const i18n = {
     googleCalendarHint: "الروابط دي هتفتح Google Calendar ببيانات المنبه جاهزة. أنت بس بتدوس Save جوه Google Calendar.",
     addTodayGoogle: "اعرض روابط Google Calendar للنهاردة",
     addToGoogle: "ضيف لـ Google Calendar",
+    googleOAuthHint: "اربط حساب Google عشان التطبيق يضيف/يحدّث منبهاتك في Google Calendar تلقائيًا. هيتم إضافة أحداث للمنبهات فقط.",
+    googleConnect: "اربط Google Calendar",
+    googleSyncActive: "زامن البروجرامات المتفعلة",
+    googleRemoveSynced: "امسح الأحداث المتزامنة",
+    googleResync: "إعادة مزامنة",
+    googleConnected: "Google Calendar متوصل ✅",
+    googleNeedConnect: "اربط Google Calendar الأول",
+    googleSyncing: "جاري المزامنة...",
+    googleSynced: "تمت مزامنة Google Calendar ✅",
+    googleRemoved: "تم حذف الأحداث من Google Calendar ✅",
+    googleSyncFailed: "حصل خطأ في Google Calendar",
+    googleAddNotice: "هيتم إضافة مواعيد البروجرامات المتفعلة إلى Google Calendar. هتشوفها من أي جهاز عليه نفس حساب Google.",
+    googleManualLinks: "روابط الإضافة اليدوية",
     doneAction: "تمام خلصت",
     snoozeAction: "أجل 5 دقايق",
     snoozeLimit: "وصلت للحد الأقصى للتأجيل",
@@ -195,6 +214,19 @@ const i18n = {
     googleCalendarHint: "These links open Google Calendar with the reminder details ready. Just tap Save inside Google Calendar.",
     addTodayGoogle: "Show today's Google Calendar links",
     addToGoogle: "Add to Google Calendar",
+    googleOAuthHint: "Connect Google so the app can automatically create/update your reminders in Google Calendar. Only reminder events are added.",
+    googleConnect: "Connect Google Calendar",
+    googleSyncActive: "Sync active programs",
+    googleRemoveSynced: "Remove synced events",
+    googleResync: "Resync",
+    googleConnected: "Google Calendar connected ✅",
+    googleNeedConnect: "Connect Google Calendar first",
+    googleSyncing: "Syncing...",
+    googleSynced: "Google Calendar synced ✅",
+    googleRemoved: "Synced events removed ✅",
+    googleSyncFailed: "Google Calendar error",
+    googleAddNotice: "Active program reminders will be added to your Google Calendar and visible on devices using the same Google account.",
+    googleManualLinks: "Manual add links",
     doneAction: "Done",
     snoozeAction: "Snooze 5 min",
     snoozeLimit: "Maximum snooze count reached",
@@ -328,7 +360,7 @@ const p1Tasks = [
 const defaultState = {
   activeProgramId: "p1",
   activeProgramIds: ["p1"],
-  settings: { sound: true, vibrate: true, theme: "light", lang: "arz", ntfy:{enabled:false, server:"https://ntfy.sh", topic:""} },
+  settings: { sound: true, vibrate: true, theme: "light", lang: "arz", ntfy:{enabled:false, server:"https://ntfy.sh", topic:""}, googleCalendar:{synced:{}, connected:false} },
   programs: [
     {
       id: "p1",
@@ -370,6 +402,8 @@ function mergeState(data) {
   merged.snoozes = data.snoozes || {};
   merged.settings = { ...defaultState.settings, ...(data.settings || {}) };
   merged.settings.ntfy = { ...defaultState.settings.ntfy, ...(data.settings?.ntfy || {}) };
+  merged.settings.googleCalendar = { ...defaultState.settings.googleCalendar, ...(data.settings?.googleCalendar || {}) };
+  merged.settings.googleCalendar.synced = data.settings?.googleCalendar?.synced || {};
   merged.programs = (
     data.programs?.length ? data.programs : defaultState.programs
   ).map(normalizeProgram);
@@ -554,7 +588,7 @@ function renderTimeline() {
       <div class="task-copy">
         <div class="task-title">${icon(t.type)} ${esc(field(t, "title"))}</div>
         <div class="task-details">${activePrograms().length > 1 ? `<span class="program-badge">${esc(t.programName)}</span> ` : ""}${t.repeatInstance ? "🔁 " : ""}${esc(field(t, "details"))}</div>
-        <div class="task-actions"><button class="ghost mini-btn" data-gcal="${t.id}" type="button">📅 ${tr("addToGoogle")}</button></div>
+        <div class="task-actions"><button class="ghost mini-btn" data-gcal="${t.id}" type="button">${isGoogleSynced(t) ? "✅ " + tr("googleSynced") : "📅 " + tr("addToGoogle")}</button></div>
       </div>
       <div class="time">${formatTime(t.time)}</div>
     </div>`,
@@ -984,6 +1018,153 @@ function renderGoogleCalendarLinks(){
     .map((task)=>`<a class="gcal-link" target="_blank" rel="noopener" href="${googleCalendarUrl(task,dateStr)}">📅 ${formatTime(task.time)} - ${activePrograms().length > 1 ? esc(task.programName) + ' - ' : ''}${esc(field(task,'title'))}</a>`)
     .join('');
 }
+
+function googleCalendarSettings(){
+  state.settings.googleCalendar ??= { synced:{}, connected:false };
+  state.settings.googleCalendar.synced ??= {};
+  return state.settings.googleCalendar;
+}
+function googleSyncId(task, dateStr){
+  return `${dateStr}__${task.id}`;
+}
+function googleApiReady(){
+  return !!(window.google?.accounts?.oauth2);
+}
+function ensureGoogleToken(){
+  return new Promise((resolve, reject) => {
+    if(googleAccessToken) return resolve(googleAccessToken);
+    if(!googleApiReady()) return reject(new Error('Google Identity Services is not loaded'));
+    googleTokenClient ||= google.accounts.oauth2.initTokenClient({
+      client_id: GOOGLE_CLIENT_ID,
+      scope: GOOGLE_CALENDAR_SCOPE,
+      callback: (tokenResponse) => {
+        if(tokenResponse?.error) return reject(new Error(tokenResponse.error));
+        googleAccessToken = tokenResponse.access_token;
+        googleCalendarSettings().connected = true;
+        save();
+        resolve(googleAccessToken);
+      },
+    });
+    googleTokenClient.requestAccessToken({ prompt: googleCalendarSettings().connected ? '' : 'consent' });
+  });
+}
+function googleEventPayload(task, dateStr){
+  const [y,m,d] = String(dateStr).split('-').map(Number);
+  const [hh,mm] = String(task.time || '00:00').split(':').map(Number);
+  const start = new Date(y, m - 1, d, hh || 0, mm || 0, 0, 0);
+  const end = new Date(start);
+  end.setMinutes(end.getMinutes() + 15);
+  const programPrefix = activePrograms().length > 1 && task.programName ? `${task.programName} - ` : '';
+  return {
+    summary: `${icon(task.type)} ${programPrefix}${field(task,'title')}`,
+    description: `${field(task,'details') || tr('reminder')}\n\nCreated by Diet Planner`,
+    start: { dateTime: start.toISOString(), timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone || 'Africa/Cairo' },
+    end: { dateTime: end.toISOString(), timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone || 'Africa/Cairo' },
+    reminders: { useDefault: false, overrides: [{ method: 'popup', minutes: 5 }] },
+    extendedProperties: { private: { dietPlannerId: googleSyncId(task, dateStr), programId: task.programId || '', taskId: task.baseTaskId || task.id } },
+  };
+}
+async function googleCalendarRequest(path, options = {}){
+  const token = await ensureGoogleToken();
+  const res = await fetch(`https://www.googleapis.com/calendar/v3${path}${path.includes('?') ? '&' : '?'}key=${encodeURIComponent(GOOGLE_API_KEY)}`, {
+    ...options,
+    headers: {
+      'Authorization': `Bearer ${token}`,
+      'Content-Type': 'application/json',
+      ...(options.headers || {}),
+    },
+  });
+  if(res.status === 401){
+    googleAccessToken = null;
+  }
+  if(!res.ok){
+    const text = await res.text().catch(()=> '');
+    throw new Error(`Google Calendar ${res.status}: ${text}`);
+  }
+  if(res.status === 204) return null;
+  return res.json();
+}
+function programDates(programs = activePrograms()){
+  const dates = [];
+  programs.forEach((p) => {
+    if(!p.start || !p.end) return;
+    const start = new Date(`${p.start}T00:00:00`);
+    const end = new Date(`${p.end}T00:00:00`);
+    for(const d = new Date(start); d <= end; d.setDate(d.getDate() + 1)){
+      dates.push(d.toISOString().slice(0,10));
+    }
+  });
+  return [...new Set(dates)].sort();
+}
+function googleSyncTasks(){
+  return programDates(activePrograms()).flatMap((dateStr) => expandedTasksForDate(dateStr, activePrograms()).map((task) => ({task, dateStr})));
+}
+async function connectGoogleCalendar(){
+  try{
+    await ensureGoogleToken();
+    showToast(tr('googleConnected'));
+    renderSettingsControls();
+  }catch(err){
+    console.error(err);
+    showToast(tr('googleSyncFailed'));
+  }
+}
+async function syncGoogleCalendar(){
+  if(!confirm(tr('googleAddNotice'))) return;
+  const cfg = googleCalendarSettings();
+  showToast(tr('googleSyncing'));
+  try{
+    await ensureGoogleToken();
+    const items = googleSyncTasks();
+    for(const {task, dateStr} of items){
+      const syncId = googleSyncId(task, dateStr);
+      const payload = googleEventPayload(task, dateStr);
+      const oldEventId = cfg.synced[syncId];
+      if(oldEventId){
+        try{
+          const updated = await googleCalendarRequest(`/calendars/primary/events/${encodeURIComponent(oldEventId)}`, { method:'PATCH', body: JSON.stringify(payload) });
+          cfg.synced[syncId] = updated.id;
+          continue;
+        }catch(err){
+          console.warn('Google event update failed; recreating', syncId, err);
+        }
+      }
+      const created = await googleCalendarRequest(`/calendars/primary/events`, { method:'POST', body: JSON.stringify(payload) });
+      cfg.synced[syncId] = created.id;
+    }
+    cfg.connected = true;
+    save();
+    renderTimeline();
+    renderSettingsControls();
+    showToast(`${tr('googleSynced')} (${items.length})`);
+  }catch(err){
+    console.error(err);
+    showToast(tr('googleSyncFailed'));
+  }
+}
+async function removeSyncedGoogleEvents(){
+  const cfg = googleCalendarSettings();
+  const entries = Object.entries(cfg.synced || {});
+  if(!entries.length){ showToast(isAr() ? 'مفيش أحداث متزامنة' : 'No synced events'); return; }
+  try{
+    await ensureGoogleToken();
+    for(const [, eventId] of entries){
+      try{ await googleCalendarRequest(`/calendars/primary/events/${encodeURIComponent(eventId)}`, { method:'DELETE' }); }catch(err){ console.warn('delete failed', eventId, err); }
+    }
+    cfg.synced = {};
+    save();
+    renderTimeline();
+    renderSettingsControls();
+    showToast(tr('googleRemoved'));
+  }catch(err){
+    console.error(err);
+    showToast(tr('googleSyncFailed'));
+  }
+}
+function isGoogleSynced(task, dateStr = todayKey()){
+  return !!googleCalendarSettings().synced?.[googleSyncId(task, dateStr)];
+}
+
 function markTaskDone(taskId, dateStr = todayKey()){
   state.done[dateStr] ??= {};
   state.done[dateStr][taskId] = true;
@@ -1206,6 +1387,11 @@ $("#scheduleNtfy").onclick = async () => {
   save();
   await scheduleNtfyReminders();
 };
+
+$("#connectGoogle") && ($("#connectGoogle").onclick = connectGoogleCalendar);
+$("#syncGoogle") && ($("#syncGoogle").onclick = syncGoogleCalendar);
+$("#resyncGoogle") && ($("#resyncGoogle").onclick = syncGoogleCalendar);
+$("#removeGoogleEvents") && ($("#removeGoogleEvents").onclick = removeSyncedGoogleEvents);
 $("#exportData").onclick = () => {
   const a = document.createElement("a");
   a.href = URL.createObjectURL(
