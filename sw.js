@@ -1,4 +1,4 @@
-const CACHE = "diet-pwa-v5";
+const CACHE = "diet-pwa-v10";
 
 const ASSETS = [
   "./",
