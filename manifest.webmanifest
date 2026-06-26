@@ -1,5 +1,5 @@
 {
-  "name": "Kerolos Diet Planner",
+  "name": "Diet Planner",
   "short_name": "Diet Planner",
   "start_url": "./index.html",
   "display": "standalone",

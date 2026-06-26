@@ -1,5 +1,5 @@
-const KEY = 'kerolosDietPwa.v2';
-const oldKey = 'kerolosDietPwa.v1';
+const KEY = 'DietPwa.v2';
+const oldKey = 'DietPwa.v1';
 const $ = (s) => document.querySelector(s);
 const $$ = (s) => [...document.querySelectorAll(s)];
 const todayKey = () => new Date().toISOString().slice(0, 10);
@@ -7,7 +7,7 @@ const uid = () => crypto.randomUUID ? crypto.randomUUID() : String(Date.now() + 
 
 const i18n = {
   arz: {
-    appSubtitle:'دايت + أدوية + منبهات', appTitle:'Kerolos Diet Planner', install:'تثبيت', activeProgram:'البروجرام الحالي',
+    appSubtitle:'دايت + أدوية + منبهات', appTitle:'Diet Planner', install:'تثبيت', activeProgram:'البروجرام الحالي',
     enableNotifications:'فعّل الإشعارات', today:'النهارده', programs:'البروجرامات', snacks:'الاسناكس', settings:'الإعدادات',
     todayAlarms:'منبهات النهارده', resetToday:'صفّر اليوم', waterTitle:'المياه - 12 كوباية', waterHint:'منهم ٢ كوباية قبل كل وجبة.',
     weightTitle:'الميزان', weightHint:'بس في الميعاد اللي الدكتور محدده، قبل الفطار وبعد الحمام، ومن غير أكل أو شرب.', weightPlaceholder:'اكتب الوزن', save:'حفظ',
@@ -18,7 +18,7 @@ const i18n = {
     from:'من', to:'لحد', activate:'فعّل', active:'متفعل', edit:'تعديل', delete:'حذف', noSnacks:'لسه مفيش صور. ارفع صور الاسناكس من الزر فوق.', noWeights:'لسه مفيش وزن متسجل.', saved:'تمام.. اتسجلت ✅', imported:'تم الاستيراد ✅', notifyOn:'الإشعارات اشتغلت ✅', notifyOff:'الإشعارات مش مسموح لها', notSupported:'المتصفح مش بيدعم الإشعارات', confirmClear:'متأكد إنك عايز تمسح كل البيانات؟', imagesSaved:'الصور اتحفظت محليًا ✅', newAlarm:'منبه جديد', alarmTime:'الوقت', alarmTitle:'العنوان', alarmDetails:'التفاصيل', alarmType:'النوع', meal:'أكل', med:'دواء', water:'مياه', snack:'اسناك', walk:'مشي', stop:'منع أكل', reminder:'ميعاد المنبه', kg:'كجم'
   },
   en: {
-    appSubtitle:'Diet + meds + alarms', appTitle:'Kerolos Diet Planner', install:'Install', activeProgram:'Active program',
+    appSubtitle:'Diet + meds + alarms', appTitle:'Diet Planner', install:'Install', activeProgram:'Active program',
     enableNotifications:'Enable notifications', today:'Today', programs:'Programs', snacks:'Snacks', settings:'Settings',
     todayAlarms:'Today alarms', resetToday:'Reset today', waterTitle:'Water - 12 cups', waterHint:'2 cups before each meal.',
     weightTitle:'Weight', weightHint:'Only on the scheduled weigh-in day: before breakfast, after bathroom, no food or drinks.', weightPlaceholder:'Enter weight', save:'Save',
@@ -231,7 +231,7 @@ $('#saveProgram').onclick = () => { const p = collectEditor(); const i = state.p
 $('#snackUpload').onchange = async (e) => { for(const f of e.target.files){ const data = await compressImage(f); state.snacks.push({id:uid(), name:f.name, data}); } e.target.value=''; save(); renderSnacks(); showToast(tr('imagesSaved')); };
 $('#soundToggle').onchange = e => { state.settings.sound = e.target.checked; save(); };
 $('#vibrateToggle').onchange = e => { state.settings.vibrate = e.target.checked; save(); };
-$('#exportData').onclick = () => { const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([JSON.stringify(state,null,2)], {type:'application/json'})); a.download='kerolos-diet-backup.json'; a.click(); };
+$('#exportData').onclick = () => { const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([JSON.stringify(state,null,2)], {type:'application/json'})); a.download='diet-backup.json'; a.click(); };
 $('#importData').onchange = e => { const f = e.target.files[0]; if(!f) return; const r = new FileReader(); r.onload = () => { state = mergeState(JSON.parse(r.result)); save(); render(); showToast(tr('imported')); }; r.readAsText(f); };
 $('#clearAll').onclick = () => { if(confirm(tr('confirmClear'))){ localStorage.removeItem(KEY); state = structuredClone(defaultState); save(); render(); } };
 window.addEventListener('beforeinstallprompt', e => { e.preventDefault(); deferredPrompt = e; $('#installBtn').classList.remove('hidden'); });

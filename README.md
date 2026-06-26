@@ -1,4 +1,4 @@
-# Kerolos Diet Planner PWA
+# Diet Planner PWA
 
 Static mobile-first PWA for diet programs, meds, water, weight, snack photos, local backup, dark mode, and local notifications.
 
