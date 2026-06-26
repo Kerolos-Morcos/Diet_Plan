@@ -12,7 +12,8 @@ const todayKey = () => {
 const uid = () =>
   crypto.randomUUID ? crypto.randomUUID() : String(Date.now() + Math.random());
 
-const GOOGLE_CLIENT_ID = "110233627128-jdtg0u6rgejf7h5fbek78nkd2co6n5s2.apps.googleusercontent.com";
+const GOOGLE_CLIENT_ID =
+  "110233627128-jdtg0u6rgejf7h5fbek78nkd2co6n5s2.apps.googleusercontent.com";
 const GOOGLE_API_KEY = "AIzaSyA-AMiF8P6QCJyx1jSwW10kdHh0KsppRV4";
 const GOOGLE_CALENDAR_SCOPE = "https://www.googleapis.com/auth/calendar.events";
 let googleTokenClient = null;
@@ -25,11 +26,11 @@ const i18n = {
     install: "تثبيت",
     activeProgram: "البروجرام الحالي",
     enableNotifications: "فعّل الإشعارات",
-    today:'النهاردة',
+    today: "النهاردة",
     programs: "البروجرامات",
     snacks: "الاسناكس",
     settings: "الإعدادات",
-    todayAlarms:'منبهات النهاردة',
+    todayAlarms: "منبهات النهاردة",
     resetToday: "صفّر اليوم",
     waterTitle: "المياه - 12 كوباية",
     waterHint: "منهم ٢ كوباية قبل كل وجبة.",
@@ -86,10 +87,12 @@ const i18n = {
     stop: "منع أكل",
     reminder: "ميعاد المنبه",
     calendarTitle: "منبهات تقويم الموبايل",
-    calendarHint: "نزّل ملف تقويم فيه مواعيد البروجرام، وافتحه بتطبيق التقويم عشان التذكيرات تشتغل حتى من غير نت.",
+    calendarHint:
+      "نزّل ملف تقويم فيه مواعيد البروجرام، وافتحه بتطبيق التقويم عشان التذكيرات تشتغل حتى من غير نت.",
     downloadCalendar: "نزّل ملف التقويم",
     ntfyTitle: "إشعارات ntfy احتياطي",
-    ntfyHint: "اختياري: لو عندك تطبيق ntfy، اكتب Topic وجدول إشعارات الـ 3 أيام الجاية. يحتاج نت وقت الجدولة ووقت وصول الإشعار.",
+    ntfyHint:
+      "اختياري: لو عندك تطبيق ntfy، اكتب Topic وجدول إشعارات الـ 3 أيام الجاية. يحتاج نت وقت الجدولة ووقت وصول الإشعار.",
     ntfyEnabled: "فعّل ntfy",
     ntfyServer: "رابط ntfy",
     ntfyTopic: "Topic خاص بيك",
@@ -104,10 +107,12 @@ const i18n = {
     ntfyFailed: "حصل خطأ في ntfy",
     calendarDownloaded: "ملف التقويم اتنزّل ✅",
     googleCalendarTitle: "Google Calendar",
-    googleCalendarHint: "الروابط دي هتفتح Google Calendar ببيانات المنبه جاهزة. أنت بس بتدوس Save جوه Google Calendar.",
+    googleCalendarHint:
+      "الروابط دي هتفتح Google Calendar ببيانات المنبه جاهزة. أنت بس بتدوس Save جوه Google Calendar.",
     addTodayGoogle: "اعرض روابط Google Calendar للنهاردة",
     addToGoogle: "ضيف لـ Google Calendar",
-    googleOAuthHint: "اربط حساب Google عشان التطبيق يضيف/يحدّث منبهاتك في Google Calendar تلقائيًا. هيتم إضافة أحداث للمنبهات فقط.",
+    googleOAuthHint:
+      "اربط حساب Google عشان التطبيق يضيف/يحدّث منبهاتك في Google Calendar تلقائيًا. هيتم إضافة أحداث للمنبهات فقط.",
     googleConnect: "اربط Google Calendar",
     googleSyncActive: "زامن البروجرامات المتفعلة",
     googleRemoveSynced: "امسح الأحداث المتزامنة",
@@ -118,7 +123,8 @@ const i18n = {
     googleSynced: "تمت مزامنة Google Calendar ✅",
     googleRemoved: "تم حذف الأحداث من Google Calendar ✅",
     googleSyncFailed: "حصل خطأ في Google Calendar",
-    googleAddNotice: "هيتم إضافة مواعيد البروجرامات المتفعلة إلى Google Calendar. هتشوفها من أي جهاز عليه نفس حساب Google.",
+    googleAddNotice:
+      "هيتم إضافة مواعيد البروجرامات المتفعلة إلى Google Calendar. هتشوفها من أي جهاز عليه نفس حساب Google.",
     googleManualLinks: "روابط الإضافة اليدوية",
     doneAction: "تمام خلصت",
     snoozeAction: "أجل 5 دقايق",
@@ -127,9 +133,12 @@ const i18n = {
     taskDone: "تمام.. اتعلمت خلصت ✅",
     repeatEvery: "يتكرر كل",
     repeatHours: "ساعة",
-    repeatHint: "لو الدواء بيتاخد كل 8 ساعات مثلًا، فعل التكرار واكتب 8. وقت المنبه الأساسي هو بداية التكرار.",
-    activeProgramsHint: "ممكن تفعّل أكتر من بروجرام في نفس الوقت. لو منبهين في نفس المعاد، هيظهروا الاتنين بالترتيب.",
-    storageAdvice: "التخزين المحلي الحالي مناسب للبيانات الصغيرة. لو هتزيد صور وتاريخ طويل، الأفضل ننقل الصور والتاريخ لـ IndexedDB المجاني داخل نفس المتصفح.",
+    repeatHint:
+      "لو الدواء بيتاخد كل 8 ساعات مثلًا، فعل التكرار واكتب 8. وقت المنبه الأساسي هو بداية التكرار.",
+    activeProgramsHint:
+      "ممكن تفعّل أكتر من بروجرام في نفس الوقت. لو منبهين في نفس المعاد، هيظهروا الاتنين بالترتيب.",
+    storageAdvice:
+      "التخزين المحلي الحالي مناسب للبيانات الصغيرة. لو هتزيد صور وتاريخ طويل، الأفضل ننقل الصور والتاريخ لـ IndexedDB المجاني داخل نفس المتصفح.",
     kg: "كجم",
   },
   en: {
@@ -199,10 +208,12 @@ const i18n = {
     stop: "No food",
     reminder: "Reminder time",
     calendarTitle: "Phone calendar alarms",
-    calendarHint: "Download a calendar file with this program reminders, then open it with your calendar app so reminders work offline.",
+    calendarHint:
+      "Download a calendar file with this program reminders, then open it with your calendar app so reminders work offline.",
     downloadCalendar: "Download calendar file",
     ntfyTitle: "Backup ntfy notifications",
-    ntfyHint: "Optional: if you use the ntfy app, add your topic and schedule the next 3 days. It needs internet when scheduling and when receiving.",
+    ntfyHint:
+      "Optional: if you use the ntfy app, add your topic and schedule the next 3 days. It needs internet when scheduling and when receiving.",
     ntfyEnabled: "Enable ntfy",
     ntfyServer: "ntfy server URL",
     ntfyTopic: "Your private topic",
@@ -217,10 +228,12 @@ const i18n = {
     ntfyFailed: "ntfy error",
     calendarDownloaded: "Calendar file downloaded ✅",
     googleCalendarTitle: "Google Calendar",
-    googleCalendarHint: "These links open Google Calendar with the reminder details ready. Just tap Save inside Google Calendar.",
+    googleCalendarHint:
+      "These links open Google Calendar with the reminder details ready. Just tap Save inside Google Calendar.",
     addTodayGoogle: "Show today's Google Calendar links",
     addToGoogle: "Add to Google Calendar",
-    googleOAuthHint: "Connect Google so the app can automatically create/update your reminders in Google Calendar. Only reminder events are added.",
+    googleOAuthHint:
+      "Connect Google so the app can automatically create/update your reminders in Google Calendar. Only reminder events are added.",
     googleConnect: "Connect Google Calendar",
     googleSyncActive: "Sync active programs",
     googleRemoveSynced: "Remove synced events",
@@ -231,7 +244,8 @@ const i18n = {
     googleSynced: "Google Calendar synced ✅",
     googleRemoved: "Synced events removed ✅",
     googleSyncFailed: "Google Calendar error",
-    googleAddNotice: "Active program reminders will be added to your Google Calendar and visible on devices using the same Google account.",
+    googleAddNotice:
+      "Active program reminders will be added to your Google Calendar and visible on devices using the same Google account.",
     googleManualLinks: "Manual add links",
     doneAction: "Done",
     snoozeAction: "Snooze 5 min",
@@ -240,9 +254,12 @@ const i18n = {
     taskDone: "Done ✅",
     repeatEvery: "Repeat every",
     repeatHours: "hours",
-    repeatHint: "For meds taken every 8 hours, enable repeat and enter 8. The alarm time is the first dose time.",
-    activeProgramsHint: "You can activate more than one program at the same time. If reminders share the same time, both will appear in order.",
-    storageAdvice: "LocalStorage is okay for small data. For many photos and long history, the free next step is IndexedDB in the same browser.",
+    repeatHint:
+      "For meds taken every 8 hours, enable repeat and enter 8. The alarm time is the first dose time.",
+    activeProgramsHint:
+      "You can activate more than one program at the same time. If reminders share the same time, both will appear in order.",
+    storageAdvice:
+      "LocalStorage is okay for small data. For many photos and long history, the free next step is IndexedDB in the same browser.",
     kg: "kg",
   },
 };
@@ -366,7 +383,14 @@ const p1Tasks = [
 const defaultState = {
   activeProgramId: "p1",
   activeProgramIds: ["p1"],
-  settings: { sound: true, vibrate: true, theme: "light", lang: "arz", ntfy:{enabled:false, server:"https://ntfy.sh", topic:""}, googleCalendar:{synced:{}, connected:false} },
+  settings: {
+    sound: true,
+    vibrate: true,
+    theme: "light",
+    lang: "arz",
+    ntfy: { enabled: false, server: "https://ntfy.sh", topic: "" },
+    googleCalendar: { synced: {}, connected: false },
+  },
   programs: [
     {
       id: "p1",
@@ -404,12 +428,22 @@ function load() {
 function mergeState(data) {
   const merged = structuredClone(defaultState);
   Object.assign(merged, data);
-  merged.activeProgramIds = Array.isArray(data.activeProgramIds) && data.activeProgramIds.length ? data.activeProgramIds : [data.activeProgramId || "p1"];
+  merged.activeProgramIds =
+    Array.isArray(data.activeProgramIds) && data.activeProgramIds.length
+      ? data.activeProgramIds
+      : [data.activeProgramId || "p1"];
   merged.snoozes = data.snoozes || {};
   merged.settings = { ...defaultState.settings, ...(data.settings || {}) };
-  merged.settings.ntfy = { ...defaultState.settings.ntfy, ...(data.settings?.ntfy || {}) };
-  merged.settings.googleCalendar = { ...defaultState.settings.googleCalendar, ...(data.settings?.googleCalendar || {}) };
-  merged.settings.googleCalendar.synced = data.settings?.googleCalendar?.synced || {};
+  merged.settings.ntfy = {
+    ...defaultState.settings.ntfy,
+    ...(data.settings?.ntfy || {}),
+  };
+  merged.settings.googleCalendar = {
+    ...defaultState.settings.googleCalendar,
+    ...(data.settings?.googleCalendar || {}),
+  };
+  merged.settings.googleCalendar.synced =
+    data.settings?.googleCalendar?.synced || {};
   merged.programs = (
     data.programs?.length ? data.programs : defaultState.programs
   ).map(normalizeProgram);
@@ -431,7 +465,10 @@ function normalizeProgram(p) {
       titleEn: t.titleEn || t.title || "",
       detailsAr: t.detailsAr || t.details || "",
       detailsEn: t.detailsEn || t.details || "",
-      repeat: { enabled: !!t.repeat?.enabled, everyHours: Number(t.repeat?.everyHours || 8) },
+      repeat: {
+        enabled: !!t.repeat?.enabled,
+        everyHours: Number(t.repeat?.everyHours || 8),
+      },
     })),
   };
 }
@@ -442,9 +479,10 @@ function activeProgram() {
   return activePrograms()[0] || state.programs[0];
 }
 function activePrograms() {
-  const ids = Array.isArray(state.activeProgramIds) && state.activeProgramIds.length
-    ? state.activeProgramIds
-    : [state.activeProgramId || "p1"];
+  const ids =
+    Array.isArray(state.activeProgramIds) && state.activeProgramIds.length
+      ? state.activeProgramIds
+      : [state.activeProgramId || "p1"];
   const found = state.programs.filter((p) => ids.includes(p.id));
   return found.length ? found : [state.programs[0]].filter(Boolean);
 }
@@ -452,10 +490,16 @@ function isProgramActive(id) {
   return activePrograms().some((p) => p.id === id);
 }
 function toggleProgramActive(id) {
-  state.activeProgramIds = Array.isArray(state.activeProgramIds) ? state.activeProgramIds : [state.activeProgramId || id];
+  state.activeProgramIds = Array.isArray(state.activeProgramIds)
+    ? state.activeProgramIds
+    : [state.activeProgramId || id];
   if (state.activeProgramIds.includes(id)) {
     if (state.activeProgramIds.length === 1) {
-      showToast(isAr() ? "لازم تسيب بروجرام واحد متفعل على الأقل" : "Keep at least one active program");
+      showToast(
+        isAr()
+          ? "لازم تسيب بروجرام واحد متفعل على الأقل"
+          : "Keep at least one active program",
+      );
       return;
     }
     state.activeProgramIds = state.activeProgramIds.filter((x) => x !== id);
@@ -471,7 +515,15 @@ function expandedTaskId(programId, taskId, time) {
 }
 function expandTaskForDate(program, task, dateStr) {
   if (!task.repeat?.enabled) {
-    return [{ ...task, programId: program.id, programName: program.name, baseTaskId: task.id, id: expandedTaskId(program.id, task.id, task.time) }];
+    return [
+      {
+        ...task,
+        programId: program.id,
+        programName: program.name,
+        baseTaskId: task.id,
+        id: expandedTaskId(program.id, task.id, task.time),
+      },
+    ];
   }
   const everyHours = Math.max(1, Number(task.repeat.everyHours || 8));
   const out = [];
@@ -493,10 +545,21 @@ function expandTaskForDate(program, task, dateStr) {
   }
   return out;
 }
-function expandedTasksForDate(dateStr = todayKey(), programs = activePrograms()) {
+function expandedTasksForDate(
+  dateStr = todayKey(),
+  programs = activePrograms(),
+) {
   return programs
-    .flatMap((program) => (program.tasks || []).flatMap((task) => expandTaskForDate(program, task, dateStr)))
-    .sort((a, b) => a.time.localeCompare(b.time) || String(a.programName).localeCompare(String(b.programName)));
+    .flatMap((program) =>
+      (program.tasks || []).flatMap((task) =>
+        expandTaskForDate(program, task, dateStr),
+      ),
+    )
+    .sort(
+      (a, b) =>
+        a.time.localeCompare(b.time) ||
+        String(a.programName).localeCompare(String(b.programName)),
+    );
 }
 function isAr() {
   return state.settings.lang === "arz";
@@ -575,12 +638,19 @@ function formatDateShort(dateStr) {
 
   return `${m}/${d}`;
 }
+function getTodayDisplay() {
+  const d = new Date();
+  const day = String(d.getDate()).padStart(2, "0");
+  const month = String(d.getMonth() + 1).padStart(2, "0");
+  return `${month}/${day}`;
+}
+
 function renderHero() {
-  const programs = activePrograms();
-  $("#activeProgramTitle").textContent = programs.map((p) => p.name).join(" + ");
-  $("#programDates").textContent = programs
-    .map((p) => `${p.name}: ${formatDateShort(p.start)} → ${formatDateShort(p.end)}`)
-    .join("  •  ");
+  const p = activeProgram();
+  $("#activeProgramTitle").textContent = p.name;
+
+  $("#programDates").textContent =
+    `النهاردة ${getTodayDisplay()} • ${tr("from")} ${formatDateShort(p.start)} ${tr("to")} ${formatDateShort(p.end)}`;
 }
 function renderTimeline() {
   const dateStr = todayKey();
@@ -610,7 +680,7 @@ function renderTimeline() {
         renderTimeline();
       }),
   );
-  $$('[data-gcal]').forEach((b) => {
+  $$("[data-gcal]").forEach((b) => {
     b.onclick = () => openTaskInGoogleCalendar(b.dataset.gcal, todayKey());
   });
 }
@@ -754,7 +824,10 @@ function collectEditor() {
         detailsEn: lang === "en" ? details : prev?.detailsEn || details,
         repeat: {
           enabled: !!row.querySelector("[data-field=repeatEnabled]")?.checked,
-          everyHours: Math.max(1, Number(row.querySelector("[data-field=repeatEvery]")?.value || 8)),
+          everyHours: Math.max(
+            1,
+            Number(row.querySelector("[data-field=repeatEvery]")?.value || 8),
+          ),
         },
       };
     }),
@@ -815,54 +888,64 @@ function renderWeights() {
       .join("") || `<li class="note">${tr("noWeights")}</li>`;
 }
 
-function toLocalDateInput(date){
+function toLocalDateInput(date) {
   const y = date.getFullYear();
   const m = String(date.getMonth() + 1).padStart(2, "0");
   const d = String(date.getDate()).padStart(2, "0");
   return `${y}-${m}-${d}`;
 }
-function parseDateOnly(str){
-  const [y,m,d] = String(str || "").split("-").map(Number);
-  if(!y || !m || !d) return null;
+function parseDateOnly(str) {
+  const [y, m, d] = String(str || "")
+    .split("-")
+    .map(Number);
+  if (!y || !m || !d) return null;
   return new Date(y, m - 1, d);
 }
-function datesBetween(start, end){
+function datesBetween(start, end) {
   const out = [];
   const s = parseDateOnly(start);
   const e = parseDateOnly(end || start);
-  if(!s || !e) return out;
-  for(let d = new Date(s); d <= e; d.setDate(d.getDate() + 1)) out.push(new Date(d));
+  if (!s || !e) return out;
+  for (let d = new Date(s); d <= e; d.setDate(d.getDate() + 1))
+    out.push(new Date(d));
   return out;
 }
-function dateWithTaskTime(date, task){
-  const [h,m] = task.time.split(":").map(Number);
+function dateWithTaskTime(date, task) {
+  const [h, m] = task.time.split(":").map(Number);
   const out = new Date(date);
   out.setHours(h || 0, m || 0, 0, 0);
   return out;
 }
-function icsDate(dt){
-  return dt.toISOString().replace(/[-:]/g, "").replace(/\.\d{3}Z$/, "Z");
+function icsDate(dt) {
+  return dt
+    .toISOString()
+    .replace(/[-:]/g, "")
+    .replace(/\.\d{3}Z$/, "Z");
 }
-function icsEscape(v){
-  return String(v || "").replace(/\\/g,"\\\\").replace(/,/g,"\\,").replace(/;/g,"\\;").replace(/\n/g,"\\n");
+function icsEscape(v) {
+  return String(v || "")
+    .replace(/\\/g, "\\\\")
+    .replace(/,/g, "\\,")
+    .replace(/;/g, "\\;")
+    .replace(/\n/g, "\\n");
 }
-function programCalendarEvents(programs = activePrograms()){
+function programCalendarEvents(programs = activePrograms()) {
   const list = Array.isArray(programs) ? programs : [programs];
   const events = [];
   list.forEach((program) => {
     const days = datesBetween(program.start, program.end);
-    days.forEach(day => {
+    days.forEach((day) => {
       const dateStr = toLocalDateInput(day);
-      expandedTasksForDate(dateStr, [program]).forEach(task => {
+      expandedTasksForDate(dateStr, [program]).forEach((task) => {
         const start = dateWithTaskTime(day, task);
         const end = new Date(start.getTime() + 15 * 60 * 1000);
-        events.push({program, task, start, end});
+        events.push({ program, task, start, end });
       });
     });
   });
-  return events.sort((a,b)=>a.start-b.start);
+  return events.sort((a, b) => a.start - b.start);
 }
-function downloadActiveProgramCalendar(){
+function downloadActiveProgramCalendar() {
   const program = activeProgram();
   const events = programCalendarEvents(activePrograms());
   const lines = [
@@ -872,9 +955,9 @@ function downloadActiveProgramCalendar(){
     "CALSCALE:GREGORIAN",
     "METHOD:PUBLISH",
   ];
-  events.forEach(({task,start,end}) => {
-    const title = `${icon(task.type)} ${field(task,"title")}`;
-    const description = field(task,"details") || tr("reminder");
+  events.forEach(({ task, start, end }) => {
+    const title = `${icon(task.type)} ${field(task, "title")}`;
+    const description = field(task, "details") || tr("reminder");
     lines.push(
       "BEGIN:VEVENT",
       `UID:${task.id}-${start.getTime()}@diet-planner`,
@@ -892,68 +975,108 @@ function downloadActiveProgramCalendar(){
     );
   });
   lines.push("END:VCALENDAR");
-  const blob = new Blob([lines.join("\r\n")], {type:"text/calendar;charset=utf-8"});
+  const blob = new Blob([lines.join("\r\n")], {
+    type: "text/calendar;charset=utf-8",
+  });
   const a = document.createElement("a");
   a.href = URL.createObjectURL(blob);
-  a.download = `${activePrograms().map(p=>p.name).join("-") || "diet-program"}-reminders.ics`;
+  a.download = `${
+    activePrograms()
+      .map((p) => p.name)
+      .join("-") || "diet-program"
+  }-reminders.ics`;
   a.click();
   URL.revokeObjectURL(a.href);
   showToast(tr("calendarDownloaded"));
 }
-function ntfySettings(){
-  state.settings.ntfy ??= {enabled:false, server:"https://ntfy.sh", topic:""};
+function ntfySettings() {
+  state.settings.ntfy ??= {
+    enabled: false,
+    server: "https://ntfy.sh",
+    topic: "",
+  };
   return state.settings.ntfy;
 }
-function cleanNtfyServer(v){
-  return String(v || "https://ntfy.sh").trim().replace(/\/+$/, "") || "https://ntfy.sh";
+function cleanNtfyServer(v) {
+  return (
+    String(v || "https://ntfy.sh")
+      .trim()
+      .replace(/\/+$/, "") || "https://ntfy.sh"
+  );
 }
-function cleanTopic(v){
-  return String(v || "").trim().replace(/[^a-zA-Z0-9_-]/g, "");
+function cleanTopic(v) {
+  return String(v || "")
+    .trim()
+    .replace(/[^a-zA-Z0-9_-]/g, "");
 }
-async function sendNtfyMessage({title, body, at, priority="5", tags="alarm_clock"}){
+async function sendNtfyMessage({
+  title,
+  body,
+  at,
+  priority = "5",
+  tags = "alarm_clock",
+}) {
   const cfg = ntfySettings();
   const topic = cleanTopic(cfg.topic);
-  if(!topic){ showToast(tr("ntfyTopicMissing")); return false; }
+  if (!topic) {
+    showToast(tr("ntfyTopicMissing"));
+    return false;
+  }
   const url = new URL(`${cleanNtfyServer(cfg.server)}/${topic}`);
   url.searchParams.set("title", title);
   url.searchParams.set("priority", priority);
   url.searchParams.set("tags", tags);
-  if(at) url.searchParams.set("at", String(Math.floor(at.getTime() / 1000)));
-  const res = await fetch(url.toString(), { method:"POST", body: body || title });
-  if(!res.ok) throw new Error(`ntfy ${res.status}`);
+  if (at) url.searchParams.set("at", String(Math.floor(at.getTime() / 1000)));
+  const res = await fetch(url.toString(), {
+    method: "POST",
+    body: body || title,
+  });
+  if (!res.ok) throw new Error(`ntfy ${res.status}`);
   return true;
 }
-async function sendNtfyTest(){
-  try{
+async function sendNtfyTest() {
+  try {
     await sendNtfyMessage({
       title: isAr() ? "تجربة Diet Planner" : "Diet Planner test",
-      body: isAr() ? "لو الإشعار وصل يبقى ntfy شغال ✅" : "If you got this, ntfy is working ✅",
-      priority:"4",
-      tags:"white_check_mark",
+      body: isAr()
+        ? "لو الإشعار وصل يبقى ntfy شغال ✅"
+        : "If you got this, ntfy is working ✅",
+      priority: "4",
+      tags: "white_check_mark",
     });
     showToast(tr("ntfyTestSent"));
-  }catch(err){
+  } catch (err) {
     console.error(err);
     showToast(tr("ntfyFailed"));
   }
 }
-function upcomingNtfyEvents(days = 3){
+function upcomingNtfyEvents(days = 3) {
   const now = new Date();
   const limit = new Date(now.getTime() + days * 24 * 60 * 60 * 1000);
   return programCalendarEvents(activeProgram())
-    .filter(e => e.start > now && e.start <= limit)
-    .sort((a,b) => a.start - b.start);
+    .filter((e) => e.start > now && e.start <= limit)
+    .sort((a, b) => a.start - b.start);
 }
-async function scheduleNtfyReminders(){
-  if(!ntfySettings().enabled){ showToast(tr("ntfySaved")); return; }
+async function scheduleNtfyReminders() {
+  if (!ntfySettings().enabled) {
+    showToast(tr("ntfySaved"));
+    return;
+  }
   const events = upcomingNtfyEvents(3);
-  if(!events.length){ showToast(isAr() ? "مفيش منبهات قريبة للجدولة" : "No upcoming reminders to schedule"); return; }
+  if (!events.length) {
+    showToast(
+      isAr()
+        ? "مفيش منبهات قريبة للجدولة"
+        : "No upcoming reminders to schedule",
+    );
+    return;
+  }
   let count = 0;
-  try{
-    for(const {task,start} of events){
+  try {
+    for (const { task, start } of events) {
       await sendNtfyMessage({
-        title: `${icon(task.type)} ${field(task,"title")}`,
-        body: field(task,"details") || tr("reminder"),
+        title: `${icon(task.type)} ${field(task, "title")}`,
+        body: field(task, "details") || tr("reminder"),
         at: start,
         priority: task.type === "med" ? "5" : "4",
         tags: task.type === "med" ? "pill,alarm_clock" : "alarm_clock",
@@ -961,259 +1084,327 @@ async function scheduleNtfyReminders(){
       count++;
     }
     showToast(`${tr("ntfyScheduled")} (${count})`);
-  }catch(err){
+  } catch (err) {
     console.error(err);
     showToast(tr("ntfyFailed"));
   }
 }
-function renderSettingsControls(){
+function renderSettingsControls() {
   const cfg = ntfySettings();
   const sound = $("#soundToggle");
   const vibrate = $("#vibrateToggle");
   const enabled = $("#ntfyEnabled");
   const server = $("#ntfyServer");
   const topic = $("#ntfyTopic");
-  if(sound) sound.checked = state.settings.sound;
-  if(vibrate) vibrate.checked = state.settings.vibrate;
-  if(enabled) enabled.checked = !!cfg.enabled;
-  if(server) server.value = cleanNtfyServer(cfg.server);
-  if(topic) topic.value = cfg.topic || "";
+  if (sound) sound.checked = state.settings.sound;
+  if (vibrate) vibrate.checked = state.settings.vibrate;
+  if (enabled) enabled.checked = !!cfg.enabled;
+  if (server) server.value = cleanNtfyServer(cfg.server);
+  if (topic) topic.value = cfg.topic || "";
 }
 
-function googleDatePart(dateStr, timeStr){
-  const [y,m,d] = String(dateStr).split('-');
-  const [hh,mm] = String(timeStr || '00:00').split(':');
+function googleDatePart(dateStr, timeStr) {
+  const [y, m, d] = String(dateStr).split("-");
+  const [hh, mm] = String(timeStr || "00:00").split(":");
   return `${y}${m}${d}T${hh}${mm}00`;
 }
-function addMinutesToDateTime(dateStr, timeStr, minutes=15){
-  const [y,m,d] = String(dateStr).split('-').map(Number);
-  const [hh,mm] = String(timeStr || '00:00').split(':').map(Number);
+function addMinutesToDateTime(dateStr, timeStr, minutes = 15) {
+  const [y, m, d] = String(dateStr).split("-").map(Number);
+  const [hh, mm] = String(timeStr || "00:00")
+    .split(":")
+    .map(Number);
   const dt = new Date(y, m - 1, d, hh || 0, mm || 0, 0, 0);
   dt.setMinutes(dt.getMinutes() + minutes);
   const yy = dt.getFullYear();
-  const mo = String(dt.getMonth() + 1).padStart(2,'0');
-  const da = String(dt.getDate()).padStart(2,'0');
-  const h = String(dt.getHours()).padStart(2,'0');
-  const mi = String(dt.getMinutes()).padStart(2,'0');
+  const mo = String(dt.getMonth() + 1).padStart(2, "0");
+  const da = String(dt.getDate()).padStart(2, "0");
+  const h = String(dt.getHours()).padStart(2, "0");
+  const mi = String(dt.getMinutes()).padStart(2, "0");
   return `${yy}${mo}${da}T${h}${mi}00`;
 }
-function googleCalendarUrl(task, dateStr){
-  const title = `${icon(task.type)} ${field(task,'title')}`;
-  const details = field(task,'details') || tr('reminder');
+function googleCalendarUrl(task, dateStr) {
+  const title = `${icon(task.type)} ${field(task, "title")}`;
+  const details = field(task, "details") || tr("reminder");
   const start = googleDatePart(dateStr, task.time);
   const end = addMinutesToDateTime(dateStr, task.time, 15);
   const params = new URLSearchParams({
-    action: 'TEMPLATE',
+    action: "TEMPLATE",
     text: title,
     dates: `${start}/${end}`,
     details,
-    ctz: Intl.DateTimeFormat().resolvedOptions().timeZone || 'Africa/Cairo'
+    ctz: Intl.DateTimeFormat().resolvedOptions().timeZone || "Africa/Cairo",
   });
   return `https://calendar.google.com/calendar/render?${params.toString()}`;
 }
-function openTaskInGoogleCalendar(taskId, dateStr){
+function openTaskInGoogleCalendar(taskId, dateStr) {
   const task = expandedTasksForDate(dateStr).find((t) => t.id === taskId);
-  if(!task) return;
-  window.open(googleCalendarUrl(task, dateStr), '_blank', 'noopener,noreferrer');
+  if (!task) return;
+  window.open(
+    googleCalendarUrl(task, dateStr),
+    "_blank",
+    "noopener,noreferrer",
+  );
 }
-function renderGoogleCalendarLinks(){
-  const box = $('#googleCalendarLinks');
-  if(!box) return;
+function renderGoogleCalendarLinks() {
+  const box = $("#googleCalendarLinks");
+  if (!box) return;
   const dateStr = todayKey();
   box.innerHTML = expandedTasksForDate(dateStr)
-    .map((task)=>`<a class="gcal-link" target="_blank" rel="noopener" href="${googleCalendarUrl(task,dateStr)}">📅 ${formatTime(task.time)} - ${activePrograms().length > 1 ? esc(task.programName) + ' - ' : ''}${esc(field(task,'title'))}</a>`)
-    .join('');
+    .map(
+      (task) =>
+        `<a class="gcal-link" target="_blank" rel="noopener" href="${googleCalendarUrl(task, dateStr)}">📅 ${formatTime(task.time)} - ${activePrograms().length > 1 ? esc(task.programName) + " - " : ""}${esc(field(task, "title"))}</a>`,
+    )
+    .join("");
 }
 
-function googleCalendarSettings(){
-  state.settings.googleCalendar ??= { synced:{}, connected:false };
+function googleCalendarSettings() {
+  state.settings.googleCalendar ??= { synced: {}, connected: false };
   state.settings.googleCalendar.synced ??= {};
   return state.settings.googleCalendar;
 }
-function googleSyncId(task, dateStr){
+function googleSyncId(task, dateStr) {
   return `${dateStr}__${task.id}`;
 }
-function googleApiReady(){
-  return !!(window.google?.accounts?.oauth2);
+function googleApiReady() {
+  return !!window.google?.accounts?.oauth2;
 }
-function ensureGoogleToken(){
+function ensureGoogleToken() {
   return new Promise((resolve, reject) => {
-    if(googleAccessToken) return resolve(googleAccessToken);
-    if(!googleApiReady()) return reject(new Error('Google Identity Services is not loaded'));
+    if (googleAccessToken) return resolve(googleAccessToken);
+    if (!googleApiReady())
+      return reject(new Error("Google Identity Services is not loaded"));
     googleTokenClient ||= google.accounts.oauth2.initTokenClient({
       client_id: GOOGLE_CLIENT_ID,
       scope: GOOGLE_CALENDAR_SCOPE,
       callback: (tokenResponse) => {
-        if(tokenResponse?.error) return reject(new Error(tokenResponse.error));
+        if (tokenResponse?.error) return reject(new Error(tokenResponse.error));
         googleAccessToken = tokenResponse.access_token;
         googleCalendarSettings().connected = true;
         save();
         resolve(googleAccessToken);
       },
     });
-    googleTokenClient.requestAccessToken({ prompt: googleCalendarSettings().connected ? '' : 'consent' });
+    googleTokenClient.requestAccessToken({
+      prompt: googleCalendarSettings().connected ? "" : "consent",
+    });
   });
 }
-function googleEventPayload(task, dateStr){
-  const [y,m,d] = String(dateStr).split('-').map(Number);
-  const [hh,mm] = String(task.time || '00:00').split(':').map(Number);
+function googleEventPayload(task, dateStr) {
+  const [y, m, d] = String(dateStr).split("-").map(Number);
+  const [hh, mm] = String(task.time || "00:00")
+    .split(":")
+    .map(Number);
   const start = new Date(y, m - 1, d, hh || 0, mm || 0, 0, 0);
   const end = new Date(start);
   end.setMinutes(end.getMinutes() + 15);
-  const programPrefix = activePrograms().length > 1 && task.programName ? `${task.programName} - ` : '';
+  const programPrefix =
+    activePrograms().length > 1 && task.programName
+      ? `${task.programName} - `
+      : "";
   return {
-    summary: `${icon(task.type)} ${programPrefix}${field(task,'title')}`,
-    description: `${field(task,'details') || tr('reminder')}\n\nCreated by Diet Planner`,
-    start: { dateTime: start.toISOString(), timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone || 'Africa/Cairo' },
-    end: { dateTime: end.toISOString(), timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone || 'Africa/Cairo' },
-    reminders: { useDefault: false, overrides: [{ method: 'popup', minutes: 5 }] },
-    extendedProperties: { private: { dietPlannerId: googleSyncId(task, dateStr), programId: task.programId || '', taskId: task.baseTaskId || task.id } },
+    summary: `${icon(task.type)} ${programPrefix}${field(task, "title")}`,
+    description: `${field(task, "details") || tr("reminder")}\n\nCreated by Diet Planner`,
+    start: {
+      dateTime: start.toISOString(),
+      timeZone:
+        Intl.DateTimeFormat().resolvedOptions().timeZone || "Africa/Cairo",
+    },
+    end: {
+      dateTime: end.toISOString(),
+      timeZone:
+        Intl.DateTimeFormat().resolvedOptions().timeZone || "Africa/Cairo",
+    },
+    reminders: {
+      useDefault: false,
+      overrides: [{ method: "popup", minutes: 5 }],
+    },
+    extendedProperties: {
+      private: {
+        dietPlannerId: googleSyncId(task, dateStr),
+        programId: task.programId || "",
+        taskId: task.baseTaskId || task.id,
+      },
+    },
   };
 }
-async function googleCalendarRequest(path, options = {}){
+async function googleCalendarRequest(path, options = {}) {
   const token = await ensureGoogleToken();
-  const res = await fetch(`https://www.googleapis.com/calendar/v3${path}${path.includes('?') ? '&' : '?'}key=${encodeURIComponent(GOOGLE_API_KEY)}`, {
-    ...options,
-    headers: {
-      'Authorization': `Bearer ${token}`,
-      'Content-Type': 'application/json',
-      ...(options.headers || {}),
+  const res = await fetch(
+    `https://www.googleapis.com/calendar/v3${path}${path.includes("?") ? "&" : "?"}key=${encodeURIComponent(GOOGLE_API_KEY)}`,
+    {
+      ...options,
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
+        ...(options.headers || {}),
+      },
     },
-  });
-  if(res.status === 401){
+  );
+  if (res.status === 401) {
     googleAccessToken = null;
   }
-  if(!res.ok){
-    const text = await res.text().catch(()=> '');
+  if (!res.ok) {
+    const text = await res.text().catch(() => "");
     throw new Error(`Google Calendar ${res.status}: ${text}`);
   }
-  if(res.status === 204) return null;
+  if (res.status === 204) return null;
   return res.json();
 }
-function programDates(programs = activePrograms()){
+function programDates(programs = activePrograms()) {
   const dates = [];
   programs.forEach((p) => {
-    if(!p.start || !p.end) return;
+    if (!p.start || !p.end) return;
     const start = new Date(`${p.start}T00:00:00`);
     const end = new Date(`${p.end}T00:00:00`);
-    for(const d = new Date(start); d <= end; d.setDate(d.getDate() + 1)){
-      dates.push(d.toISOString().slice(0,10));
+    for (const d = new Date(start); d <= end; d.setDate(d.getDate() + 1)) {
+      dates.push(d.toISOString().slice(0, 10));
     }
   });
   return [...new Set(dates)].sort();
 }
-function googleSyncTasks(){
-  return programDates(activePrograms()).flatMap((dateStr) => expandedTasksForDate(dateStr, activePrograms()).map((task) => ({task, dateStr})));
+function googleSyncTasks() {
+  return programDates(activePrograms()).flatMap((dateStr) =>
+    expandedTasksForDate(dateStr, activePrograms()).map((task) => ({
+      task,
+      dateStr,
+    })),
+  );
 }
-async function connectGoogleCalendar(){
-  try{
+async function connectGoogleCalendar() {
+  try {
     await ensureGoogleToken();
-    showToast(tr('googleConnected'));
+    showToast(tr("googleConnected"));
     renderSettingsControls();
-  }catch(err){
+  } catch (err) {
     console.error(err);
-    showToast(tr('googleSyncFailed'));
+    showToast(tr("googleSyncFailed"));
   }
 }
-async function syncGoogleCalendar(){
-  if(!confirm(tr('googleAddNotice'))) return;
+async function syncGoogleCalendar() {
+  if (!confirm(tr("googleAddNotice"))) return;
   const cfg = googleCalendarSettings();
-  showToast(tr('googleSyncing'));
-  try{
+  showToast(tr("googleSyncing"));
+  try {
     await ensureGoogleToken();
     const items = googleSyncTasks();
-    for(const {task, dateStr} of items){
+    for (const { task, dateStr } of items) {
       const syncId = googleSyncId(task, dateStr);
       const payload = googleEventPayload(task, dateStr);
       const oldEventId = cfg.synced[syncId];
-      if(oldEventId){
-        try{
-          const updated = await googleCalendarRequest(`/calendars/primary/events/${encodeURIComponent(oldEventId)}`, { method:'PATCH', body: JSON.stringify(payload) });
+      if (oldEventId) {
+        try {
+          const updated = await googleCalendarRequest(
+            `/calendars/primary/events/${encodeURIComponent(oldEventId)}`,
+            { method: "PATCH", body: JSON.stringify(payload) },
+          );
           cfg.synced[syncId] = updated.id;
           continue;
-        }catch(err){
-          console.warn('Google event update failed; recreating', syncId, err);
+        } catch (err) {
+          console.warn("Google event update failed; recreating", syncId, err);
         }
       }
-      const created = await googleCalendarRequest(`/calendars/primary/events`, { method:'POST', body: JSON.stringify(payload) });
+      const created = await googleCalendarRequest(`/calendars/primary/events`, {
+        method: "POST",
+        body: JSON.stringify(payload),
+      });
       cfg.synced[syncId] = created.id;
     }
     cfg.connected = true;
     save();
     renderTimeline();
     renderSettingsControls();
-    showToast(`${tr('googleSynced')} (${items.length})`);
-  }catch(err){
+    showToast(`${tr("googleSynced")} (${items.length})`);
+  } catch (err) {
     console.error(err);
-    showToast(tr('googleSyncFailed'));
+    showToast(tr("googleSyncFailed"));
   }
 }
-async function removeSyncedGoogleEvents(){
+async function removeSyncedGoogleEvents() {
   const cfg = googleCalendarSettings();
   const entries = Object.entries(cfg.synced || {});
-  if(!entries.length){ showToast(isAr() ? 'مفيش أحداث متزامنة' : 'No synced events'); return; }
-  try{
+  if (!entries.length) {
+    showToast(isAr() ? "مفيش أحداث متزامنة" : "No synced events");
+    return;
+  }
+  try {
     await ensureGoogleToken();
-    for(const [, eventId] of entries){
-      try{ await googleCalendarRequest(`/calendars/primary/events/${encodeURIComponent(eventId)}`, { method:'DELETE' }); }catch(err){ console.warn('delete failed', eventId, err); }
+    for (const [, eventId] of entries) {
+      try {
+        await googleCalendarRequest(
+          `/calendars/primary/events/${encodeURIComponent(eventId)}`,
+          { method: "DELETE" },
+        );
+      } catch (err) {
+        console.warn("delete failed", eventId, err);
+      }
     }
     cfg.synced = {};
     save();
     renderTimeline();
     renderSettingsControls();
-    showToast(tr('googleRemoved'));
-  }catch(err){
+    showToast(tr("googleRemoved"));
+  } catch (err) {
     console.error(err);
-    showToast(tr('googleSyncFailed'));
+    showToast(tr("googleSyncFailed"));
   }
 }
-function isGoogleSynced(task, dateStr = todayKey()){
+function isGoogleSynced(task, dateStr = todayKey()) {
   return !!googleCalendarSettings().synced?.[googleSyncId(task, dateStr)];
 }
 
-function markTaskDone(taskId, dateStr = todayKey()){
+function markTaskDone(taskId, dateStr = todayKey()) {
   state.done[dateStr] ??= {};
   state.done[dateStr][taskId] = true;
-  if(state.snoozes?.[dateStr]) delete state.snoozes[dateStr][taskId];
+  if (state.snoozes?.[dateStr]) delete state.snoozes[dateStr][taskId];
   save();
   renderTimeline();
-  showToast(tr('taskDone'));
+  showToast(tr("taskDone"));
 }
-function findTaskById(taskId, dateStr = todayKey()){
-  const expanded = expandedTasksForDate(dateStr, state.programs).find((t)=>t.id === taskId);
-  if(expanded) return expanded;
-  for(const program of state.programs){
-    const task = program.tasks.find((t)=>t.id === taskId || t.id === String(taskId).split("__")[1]);
-    if(task) return {...task, programId: program.id, programName: program.name, baseTaskId: task.id};
+function findTaskById(taskId, dateStr = todayKey()) {
+  const expanded = expandedTasksForDate(dateStr, state.programs).find(
+    (t) => t.id === taskId,
+  );
+  if (expanded) return expanded;
+  for (const program of state.programs) {
+    const task = program.tasks.find(
+      (t) => t.id === taskId || t.id === String(taskId).split("__")[1],
+    );
+    if (task)
+      return {
+        ...task,
+        programId: program.id,
+        programName: program.name,
+        baseTaskId: task.id,
+      };
   }
   return null;
 }
-function snoozeTask(taskId, dateStr = todayKey()){
+function snoozeTask(taskId, dateStr = todayKey()) {
   const task = findTaskById(taskId, dateStr);
-  if(!task) return;
+  if (!task) return;
   state.snoozes ??= {};
   state.snoozes[dateStr] ??= {};
   const count = state.snoozes[dateStr][taskId] || 0;
-  if(count >= 3){
-    showToast(tr('snoozeLimit'));
+  if (count >= 3) {
+    showToast(tr("snoozeLimit"));
     return;
   }
   state.snoozes[dateStr][taskId] = count + 1;
   save();
-  showToast(tr('snoozed'));
-  timers.push(setTimeout(()=>notifyTask(task, dateStr), 5 * 60 * 1000));
+  showToast(tr("snoozed"));
+  timers.push(setTimeout(() => notifyTask(task, dateStr), 5 * 60 * 1000));
 }
-function handleAlarmAction(action, taskId, dateStr){
-  if(!taskId) return;
-  if(action === 'done') markTaskDone(taskId, dateStr || todayKey());
-  if(action === 'snooze') snoozeTask(taskId, dateStr || todayKey());
+function handleAlarmAction(action, taskId, dateStr) {
+  if (!taskId) return;
+  if (action === "done") markTaskDone(taskId, dateStr || todayKey());
+  if (action === "snooze") snoozeTask(taskId, dateStr || todayKey());
 }
-function handleAlarmActionFromUrl(){
+function handleAlarmActionFromUrl() {
   const params = new URLSearchParams(location.search);
-  const action = params.get('alarmAction');
-  const taskId = params.get('taskId');
-  const dateStr = params.get('date') || todayKey();
-  if(action && taskId){
+  const action = params.get("alarmAction");
+  const taskId = params.get("taskId");
+  const dateStr = params.get("date") || todayKey();
+  if (action && taskId) {
     handleAlarmAction(action, taskId, dateStr);
     history.replaceState({}, document.title, location.pathname + location.hash);
   }
@@ -1256,12 +1447,13 @@ function notifyTask(t, dateStr = todayKey()) {
   const snoozeCount = state.snoozes[dateStr][t.id] || 0;
   const title = `${icon(t.type)} ${field(t, "title")}`;
   const body = field(t, "details") || tr("reminder");
-  const actions = snoozeCount >= 3
-    ? [{ action: "done", title: tr("doneAction") }]
-    : [
-        { action: "done", title: tr("doneAction") },
-        { action: "snooze", title: tr("snoozeAction") },
-      ];
+  const actions =
+    snoozeCount >= 3
+      ? [{ action: "done", title: tr("doneAction") }]
+      : [
+          { action: "done", title: tr("doneAction") },
+          { action: "snooze", title: tr("snoozeAction") },
+        ];
   const payload = {
     type: "NOTIFY",
     title,
@@ -1273,7 +1465,14 @@ function notifyTask(t, dateStr = todayKey()) {
   };
   if (navigator.serviceWorker?.controller)
     navigator.serviceWorker.controller.postMessage(payload);
-  else new Notification(title, { body, tag: payload.tag, actions, requireInteraction: true, data: payload.data });
+  else
+    new Notification(title, {
+      body,
+      tag: payload.tag,
+      actions,
+      requireInteraction: true,
+      data: payload.data,
+    });
 }
 
 $$(".tab").forEach(
@@ -1339,7 +1538,9 @@ $("#saveProgram").onclick = () => {
   if (i >= 0) state.programs[i] = p;
   else {
     state.programs.push(p);
-    state.activeProgramIds = Array.isArray(state.activeProgramIds) ? state.activeProgramIds : [];
+    state.activeProgramIds = Array.isArray(state.activeProgramIds)
+      ? state.activeProgramIds
+      : [];
     state.activeProgramIds.push(p.id);
     state.activeProgramId = p.id;
   }
@@ -1367,7 +1568,8 @@ $("#vibrateToggle").onchange = (e) => {
   save();
 };
 $("#downloadCalendar").onclick = downloadActiveProgramCalendar;
-$("#showGoogleLinks") && ($("#showGoogleLinks").onclick = renderGoogleCalendarLinks);
+$("#showGoogleLinks") &&
+  ($("#showGoogleLinks").onclick = renderGoogleCalendarLinks);
 $("#saveNtfy").onclick = () => {
   const cfg = ntfySettings();
   cfg.enabled = $("#ntfyEnabled").checked;
@@ -1397,7 +1599,8 @@ $("#scheduleNtfy").onclick = async () => {
 $("#connectGoogle") && ($("#connectGoogle").onclick = connectGoogleCalendar);
 $("#syncGoogle") && ($("#syncGoogle").onclick = syncGoogleCalendar);
 $("#resyncGoogle") && ($("#resyncGoogle").onclick = syncGoogleCalendar);
-$("#removeGoogleEvents") && ($("#removeGoogleEvents").onclick = removeSyncedGoogleEvents);
+$("#removeGoogleEvents") &&
+  ($("#removeGoogleEvents").onclick = removeSyncedGoogleEvents);
 $("#exportData").onclick = () => {
   const a = document.createElement("a");
   a.href = URL.createObjectURL(
@@ -1446,7 +1649,10 @@ if ("serviceWorker" in navigator) {
       const worker = reg.installing;
 
       worker?.addEventListener("statechange", () => {
-        if (worker.state === "installed" && navigator.serviceWorker.controller) {
+        if (
+          worker.state === "installed" &&
+          navigator.serviceWorker.controller
+        ) {
           worker.postMessage({ type: "SKIP_WAITING" });
         }
       });
